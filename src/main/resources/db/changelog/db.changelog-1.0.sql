@@ -1,9 +1,6 @@
 --liquibase formatted sql
 
 --changeset maxvdovin:1
-create schema if not exists weather;
-
---changeset maxvdovin:2
 create table if not exists Users
 (
     id       serial primary key,
@@ -11,7 +8,7 @@ create table if not exists Users
     password varchar(255) not null
 );
 
---changeset maxvdovin:3
+--changeset maxvdovin:2
 create table if not exists Locations
 (
     id        serial primary key,
@@ -21,7 +18,7 @@ create table if not exists Locations
     longitude double precision not null
 );
 
---changeset maxvdovin:4
+--changeset maxvdovin:3
 create table if not exists Sessions
 (
     id         uuid primary key,
