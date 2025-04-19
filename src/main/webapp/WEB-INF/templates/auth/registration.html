@@ -9,7 +9,7 @@
         <form th:method="post" th:action="@{/auth/register}" th:object="${user}">
             <div>
                 <label for="login">Login</label>
-                <input type="text" th:field="*{username}" id="login"/>
+                <input type="text" th:field="*{login}" id="login"/>
                 <br/>
                 <label for="password">Password</label>
                 <input type="password" th:field="*{password}" id="password"/>
