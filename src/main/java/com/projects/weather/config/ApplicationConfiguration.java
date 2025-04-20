@@ -1,6 +1,7 @@
 package com.projects.weather.config;
 
 import liquibase.integration.spring.SpringLiquibase;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -67,10 +68,10 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public PlatformTransactionManager hibernateTransactionManager() {
-        var hibernateTransactionManager = new HibernateTransactionManager();
-        hibernateTransactionManager.setSessionFactory(sessionFactory().getObject());
-        return hibernateTransactionManager;
+    public PlatformTransactionManager transactionManager(SessionFactory sessionFactory) {
+        var transactionManager = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory);
+        return transactionManager;
     }
 
     @Bean
