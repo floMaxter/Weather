@@ -1,6 +1,9 @@
 --liquibase formatted sql
 
 --changeset maxvdovin:1
+create extension if not exists "uuid-ossp";
+
+--changeset maxvdovin:2
 create table if not exists Users
 (
     id       serial primary key,
@@ -8,7 +11,7 @@ create table if not exists Users
     password varchar(255) not null
 );
 
---changeset maxvdovin:2
+--changeset maxvdovin:3
 create table if not exists Locations
 (
     id        serial primary key,
@@ -18,10 +21,10 @@ create table if not exists Locations
     longitude double precision not null
 );
 
---changeset maxvdovin:3
+--changeset maxvdovin:4
 create table if not exists Sessions
 (
-    id         uuid primary key,
+    id         uuid primary key default uuid_generate_v4(),
     user_id    int references Users (id),
     expires_at timestamp not null
 );
