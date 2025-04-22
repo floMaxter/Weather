@@ -13,4 +13,6 @@ public interface GenericRepository<K extends Serializable, E extends Identifiabl
     Optional<E> findById(K id);
 
     List<E> findAll();
+
+    void delete(K id);
 }

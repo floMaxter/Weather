@@ -62,6 +62,20 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E exte
         }
     }
 
+    @Override
+    public void delete(K id) {
+        try (var session = sessionFactory.openSession()) {
+            var tx = session.beginTransaction();
+
+            var entity = session.find(entityClass, id);
+            if (entity != null) {
+                session.remove(entity);
+            }
+
+            tx.commit();
+        }
+    }
+
     private void rollbackTransaction(Transaction transaction) {
         if (transaction != null && transaction.isActive()) {
             try {

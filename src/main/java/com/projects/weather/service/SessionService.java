@@ -33,4 +33,8 @@ public class SessionService {
         var session = sessionRepository.save(new Session(user, expiresAt));
         return session.getId();
     }
+
+    public void delete(UUID id) {
+        sessionRepository.delete(id);
+    }
 }

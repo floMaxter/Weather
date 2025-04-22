@@ -27,6 +27,10 @@ public class AuthService {
         return sessionService.save(findUserDto);
     }
 
+    public void logout(UUID sessionId) {
+        sessionService.delete(sessionId);
+    }
+
     public void register(RegisterRequestDto registerRequestDto) {
         var hashedPassword = BCrypt.hashpw(registerRequestDto.password(), BCrypt.gensalt());
         userService.save(new UserDto(null, registerRequestDto.login(), hashedPassword));

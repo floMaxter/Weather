@@ -6,7 +6,10 @@
     </head>
     <body>
         <div th:each="user : ${users}">
-            <p th:text="${user.login}">User</p>
+            <p th:text="${user.login()}">User</p>
         </div>
+        <form th:method="post" th:action="@{/auth/logout}">
+            <input type="submit" value="Logout">
+        </form>
     </body>
 </html>
