@@ -16,9 +16,12 @@ public class UserRepository extends AbstractHibernateRepository<Long, User> {
     }
 
     public Optional<User> findByLogin(String login) {
-        var session = sessionFactory.getCurrentSession();
-        return session.createQuery("select u from User u where u.login = :login", User.class)
-                .setParameter("login", login)
-                .uniqueResultOptional();
+        try (var session = sessionFactory.openSession()) {
+            return session.createQuery("select u from User u where u.login = :login", User.class)
+                    .setParameter("login", login)
+                    .uniqueResultOptional();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

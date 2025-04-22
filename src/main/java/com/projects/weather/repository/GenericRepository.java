@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface GenericRepository<K extends Serializable, E extends Identifiable<K>> {
 
-    K save(E entity);
+    E save(E entity);
 
     Optional<E> findById(K id);
 

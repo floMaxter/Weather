@@ -1,7 +1,6 @@
 package com.projects.weather.config;
 
 import liquibase.integration.spring.SpringLiquibase;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -11,10 +10,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
@@ -30,7 +26,6 @@ import java.util.Properties;
         @PropertySource("classpath:hibernate.properties"),
         @PropertySource("classpath:application.properties")
 })
-@EnableTransactionManagement
 @EnableWebMvc
 public class ApplicationConfiguration {
 
@@ -69,13 +64,6 @@ public class ApplicationConfiguration {
         properties.put("hibernate.format_sql", env.getRequiredProperty("hibernate.format_sql"));
         properties.put("hibernate.highlight_sql", env.getRequiredProperty("hibernate.highlight_sql"));
         return properties;
-    }
-
-    @Bean
-    public PlatformTransactionManager transactionManager(SessionFactory sessionFactory) {
-        var transactionManager = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory);
-        return transactionManager;
     }
 
     @Bean
