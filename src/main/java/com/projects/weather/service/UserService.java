@@ -1,14 +1,43 @@
 package com.projects.weather.service;
 
 import com.projects.weather.dto.UserDto;
+import com.projects.weather.mapper.UserMapper;
+import com.projects.weather.repository.UserRepository;
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface UserService {
+@Service
+@Transactional(readOnly = true)
+public class UserService {
 
-    List<UserDto> findAll();
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    UserDto findById(Long id);
+    @Autowired
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
 
-    void save(UserDto userDto);
+    public UserDto findById(Long id) {
+        return userRepository.findById(id)
+                .map(userMapper::toDto)
+                .orElse(null);
+    }
+
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public void save(UserDto userDto) {
+        userDto.setPassword(BCrypt.hashpw(userDto.getPassword(), BCrypt.gensalt()));
+        userRepository.save(userMapper.toEntity(userDto));
+    }
 }
