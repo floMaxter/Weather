@@ -10,5 +10,5 @@ public interface UserService {
 
     UserDto findById(Long id);
 
-    void save(UserDto user);
+    void save(UserDto userDto);
 }

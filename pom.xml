@@ -16,6 +16,7 @@
         <postgresql.version>42.7.5</postgresql.version>
         <hibernate-core.version>6.6.8.Final</hibernate-core.version>
         <liquibase.version>4.31.1</liquibase.version>
+        <jbcrypt.version>0.4</jbcrypt.version>
         <thymeleaf.version>3.1.3.RELEASE</thymeleaf.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <logback-classic.version>1.5.18</logback-classic.version>
@@ -64,6 +65,13 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
+        </dependency>
+
+        <!--Security-->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${jbcrypt.version}</version>
         </dependency>
 
         <!--Template engine-->

@@ -4,6 +4,7 @@ import com.projects.weather.dto.UserDto;
 import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.repository.UserRepository;
 import com.projects.weather.service.UserService;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void save(UserDto user) {
-        userRepository.save(userMapper.toEntity(user));
+    public void save(UserDto userDto) {
+        userDto.setPassword(BCrypt.hashpw(userDto.getPassword(), BCrypt.gensalt()));
+        userRepository.save(userMapper.toEntity(userDto));
     }
 }

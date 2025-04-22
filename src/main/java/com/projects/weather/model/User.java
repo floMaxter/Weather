@@ -18,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "Users")
-public class User {
+public class User implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

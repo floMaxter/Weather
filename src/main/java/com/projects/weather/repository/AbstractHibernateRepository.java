@@ -1,5 +1,6 @@
 package com.projects.weather.repository;
 
+import com.projects.weather.model.Identifiable;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,11 @@ import java.util.Optional;
 
 @Repository
 @Slf4j
-public abstract class AbstractHibernateRepository<K extends Serializable, E> implements GenericRepository<K, E> {
+public abstract class AbstractHibernateRepository<K extends Serializable, E extends Identifiable<K>>
+        implements GenericRepository<K, E> {
 
-    private final SessionFactory sessionFactory;
-    private final Class<E> entityClass;
+    protected final SessionFactory sessionFactory;
+    protected final Class<E> entityClass;
 
     @Autowired
     protected AbstractHibernateRepository(SessionFactory sessionFactory, Class<E> entityClass) {
@@ -37,9 +39,10 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E> imp
     }
 
     @Override
-    public void save(E entity) {
+    public K save(E entity) {
         log.info("Start save entity: {}", entity);
         var session = sessionFactory.getCurrentSession();
         session.persist(entity);
+        return entity.getId();
     }
 }

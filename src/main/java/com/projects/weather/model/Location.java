@@ -19,7 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "Locations")
-public class Location {
+public class Location implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

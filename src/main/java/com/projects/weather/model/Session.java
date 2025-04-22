@@ -23,7 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "Sessions")
-public class Session {
+public class Session implements Identifiable<UUID> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,4 +34,9 @@ public class Session {
 
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
+
+    public Session(User user, LocalDateTime expiresAt) {
+        this.user = user;
+        this.expiresAt = expiresAt;
+    }
 }
