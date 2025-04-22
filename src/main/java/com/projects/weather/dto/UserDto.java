@@ -1,10 +1,4 @@
 package com.projects.weather.dto;
 
-import lombok.Data;
-
-@Data
-public class UserDto {
-
-        private String login;
-        private String password;
+public record UserDto(Long id, String login, String password) {
 }

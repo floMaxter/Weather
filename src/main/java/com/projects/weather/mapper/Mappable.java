@@ -2,10 +2,10 @@ package com.projects.weather.mapper;
 
 import java.util.List;
 
-public interface Mappable<E, D> {
+public interface Mappable<F, T> {
 
-    D toDto(E entity);
-    List<D> toDto(List<E> entities);
-    E toEntity(D dto);
-    List<E> toEntity(List<D> dtos);
+    T mapFrom(F object);
+    List<T> mapFrom(List<F> objects);
+    F mapTo(T object);
+    List<F> mapTo(List<T> objects);
 }

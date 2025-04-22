@@ -3,7 +3,6 @@ package com.projects.weather.service;
 import com.projects.weather.dto.UserDto;
 import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.repository.UserRepository;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +22,23 @@ public class UserService {
 
     public UserDto findById(Long id) {
         return userRepository.findById(id)
-                .map(userMapper::toDto)
-                .orElse(null);
+                .map(userMapper::mapTo)
+                .orElseThrow(() -> new RuntimeException("The user with this id was not found: " + id));
+    }
+
+    public UserDto findByLogin(String login) {
+        return userRepository.findByLogin(login)
+                .map(userMapper::mapTo)
+                .orElseThrow(() -> new RuntimeException("The user with this login was not found: " + login));
     }
 
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
-                .map(userMapper::toDto)
+                .map(userMapper::mapTo)
                 .toList();
     }
 
     public void save(UserDto userDto) {
-        userDto.setPassword(BCrypt.hashpw(userDto.getPassword(), BCrypt.gensalt()));
-        userRepository.save(userMapper.toEntity(userDto));
+        userRepository.save(userMapper.mapFrom(userDto));
     }
 }

@@ -5,5 +5,5 @@ import com.projects.weather.model.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper extends Mappable<User, UserDto> {
+public interface UserMapper extends Mappable<UserDto, User> {
 }

@@ -1,8 +1,8 @@
 package com.projects.weather.controller;
 
-import com.projects.weather.dto.UserDto;
+import com.projects.weather.dto.LoginRequestDto;
+import com.projects.weather.dto.RegisterRequestDto;
 import com.projects.weather.service.AuthService;
-import com.projects.weather.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -20,23 +20,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
 
     @Autowired
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.userService = userService;
     }
 
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute("user", new UserDto());
+        model.addAttribute("loginRequest", new LoginRequestDto("", ""));
         return "auth/login";
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute("user") UserDto userDto, HttpServletResponse resp) {
-        var sessionId = authService.login(userDto);
+    public String login(@ModelAttribute("user") LoginRequestDto loginRequestDto, HttpServletResponse resp) {
+        var sessionId = authService.login(loginRequestDto);
         var userSessionIdCookie = new Cookie("USERSESSIONID", sessionId.toString());
         userSessionIdCookie.setPath("/");
         resp.addCookie(userSessionIdCookie);
@@ -46,13 +44,13 @@ public class AuthController {
 
     @GetMapping("/register")
     public String registrationPage(Model model) {
-        model.addAttribute("user", new UserDto());
+        model.addAttribute("registerRequest", new RegisterRequestDto("", ""));
         return "auth/registration";
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute("user") UserDto userDto) {
-        userService.save(userDto);
+    public String register(@ModelAttribute("user") RegisterRequestDto registerRequestDto) {
+        authService.register(registerRequestDto);
         return "redirect:/auth/login";
     }
 }
