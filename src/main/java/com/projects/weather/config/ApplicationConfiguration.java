@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -22,10 +21,7 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan("com.projects.weather")
-@PropertySources({
-        @PropertySource("classpath:hibernate.properties"),
-        @PropertySource("classpath:application.properties")
-})
+@PropertySource("classpath:application.properties")
 @EnableWebMvc
 public class ApplicationConfiguration {
 
