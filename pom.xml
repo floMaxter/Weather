@@ -22,6 +22,7 @@
         <logback-classic.version>1.5.18</logback-classic.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <dotenv-java.version>3.2.0</dotenv-java.version>
         <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <assertj-core.version>4.0.0-M1</assertj-core.version>
         <mockito.version>5.17.0</mockito.version>
@@ -121,6 +122,11 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>${dotenv-java.version}</version>
         </dependency>
 
         <!--Tests-->

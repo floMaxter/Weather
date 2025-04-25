@@ -1,5 +1,6 @@
 package com.projects.weather.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -27,6 +28,7 @@ public class ApplicationConfiguration {
 
     private final ApplicationContext applicationContext;
     private final Environment env;
+    private static final Dotenv dotenv = Dotenv.load();
 
     @Autowired
     public ApplicationConfiguration(ApplicationContext applicationContext, Environment env) {
@@ -38,9 +40,9 @@ public class ApplicationConfiguration {
     public DataSource dataSource() {
         var dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(env.getRequiredProperty("hibernate.driver_class"));
-        dataSource.setUrl(env.getRequiredProperty("hibernate.connection.url"));
-        dataSource.setUsername(env.getRequiredProperty("hibernate.connection.username"));
-        dataSource.setPassword(env.getRequiredProperty("hibernate.connection.password"));
+        dataSource.setUrl(dotenv.get("DB_URL"));
+        dataSource.setUsername(dotenv.get("DB_USERNAME"));
+        dataSource.setPassword(dotenv.get("DB_PASSWORD"));
         return dataSource;
     }
 
