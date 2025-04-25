@@ -41,4 +41,8 @@ public class UserService {
     public void save(UserDto userDto) {
         userRepository.save(userMapper.mapFrom(userDto));
     }
+
+    public void delete(Long id) {
+        userRepository.delete(id);
+    }
 }
