@@ -37,4 +37,8 @@ public class SessionService {
     public void delete(UUID id) {
         sessionRepository.delete(id);
     }
+
+    public void deleteAll() {
+        sessionRepository.deleteAll();
+    }
 }
