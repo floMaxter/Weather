@@ -2,6 +2,3 @@ databaseChangeLog:
   - include:
       file: /test/db.changelog-test-1.0.sql
       relativeToChangelogFile: true
-  - include:
-      file: db/changelog/test/db.test-data-1.0.sql
-      context: test
