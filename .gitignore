@@ -1,0 +1,19 @@
+# IntelliJ IDEA
+.idea/
+
+# Maven
+target/
+*.log
+
+# General
+.DS_Store
+*.class
+*.iml
+*.ipr
+*.iws
+*.bak
+*.tmp
+*.swp
+*~
+.env
+*.db
