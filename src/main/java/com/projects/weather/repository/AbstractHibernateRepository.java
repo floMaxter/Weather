@@ -65,14 +65,35 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E exte
     @Override
     public void delete(K id) {
         try (var session = sessionFactory.openSession()) {
-            var tx = session.beginTransaction();
+            var transaction = session.beginTransaction();
 
             var entity = session.find(entityClass, id);
             if (entity != null) {
                 session.remove(entity);
             }
 
-            tx.commit();
+            transaction.commit();
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        Transaction transaction = null;
+        try (var session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+
+            var entities = findAll();
+            for (var entity : entities) {
+                session.remove(entity);
+                session.flush();
+                session.clear();
+            }
+
+            transaction.commit();
+        } catch (RuntimeException e) {
+            log.error("Error deleting all entities of type {}", entityClass.getSimpleName());
+            rollbackTransaction(transaction);
+            throw new RuntimeException(e);
         }
     }
 
