@@ -23,6 +23,7 @@
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <dotenv-java.version>3.2.0</dotenv-java.version>
+        <jackson-databind.version>2.19.0</jackson-databind.version>
         <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <assertj-core.version>4.0.0-M1</assertj-core.version>
         <mockito.version>5.17.0</mockito.version>
@@ -127,6 +128,11 @@
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>${dotenv-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
         </dependency>
 
         <!--Tests-->
