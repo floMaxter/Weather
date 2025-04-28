@@ -26,7 +26,7 @@ public class OpenWeatherClient {
     @Autowired
     public OpenWeatherClient(RestClient restClient,
                              String openWeatherApiKey,
-                             @Value("${weather.units_of_measurement}") String unitsOfMeasurement) {
+                             @Value("${api.weather.units_of_measurement}") String unitsOfMeasurement) {
         this.restClient = restClient;
         this.openWeatherApiKey = openWeatherApiKey;
         this.unitsOfMeasurement = unitsOfMeasurement;
