@@ -14,7 +14,6 @@ import org.springframework.web.client.RestClientException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class OpenWeatherClient {
@@ -35,8 +34,12 @@ public class OpenWeatherClient {
     public List<LocationResponseDto> findAllLocationsByName(String name, int limit) {
         try {
             var locations = restClient.get()
-                    .uri("http://api.openweathermap.org/geo/1.0/direct?q={city name}&limit={limit}&appid={API key}",
-                            name, limit, openWeatherApiKey)
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/geo/1.0/direct")
+                            .queryParam("q", name)
+                            .queryParam("limit", limit)
+                            .queryParam("appid", openWeatherApiKey)
+                            .build())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((req, resp) -> {
                         throw new OpenWeatherClientException("Client error while fetching locations: "
@@ -54,11 +57,16 @@ public class OpenWeatherClient {
         }
     }
 
-    public Optional<WeatherDataResponseDto> findWeatherDataByCoordinates(Double latitude, Double longitude) {
+    public WeatherDataResponseDto findWeatherDataByCoordinates(Double latitude, Double longitude) {
         try {
-            var weatherDataResponseDto = restClient.get()
-                    .uri("https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}&units={units of measurement}",
-                            latitude, longitude, openWeatherApiKey, unitsOfMeasurement)
+            var response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("data/2.5/weather")
+                            .queryParam("lat", latitude)
+                            .queryParam("lon", longitude)
+                            .queryParam("appid", openWeatherApiKey)
+                            .queryParam("units", unitsOfMeasurement)
+                            .build())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((req, resp) -> {
                         throw new OpenWeatherClientException("Client error while fetching weather: "
@@ -70,7 +78,11 @@ public class OpenWeatherClient {
                     }))
                     .body(WeatherDataResponseDto.class);
 
-            return Optional.ofNullable(weatherDataResponseDto);
+            if (response == null) {
+                throw new OpenWeatherClientException("OpenWeather API returned empty response");
+            }
+
+            return response;
         } catch (RestClientException e) {
             throw new OpenWeatherClientException("Failed to fetch weather data from OpenWeather API", e);
         }

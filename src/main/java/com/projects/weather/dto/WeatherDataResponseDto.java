@@ -9,12 +9,12 @@ import java.util.List;
 public record WeatherDataResponseDto(@JsonProperty("weather") List<WeatherInfo> weatherInfo,
                                      @JsonProperty("main") TemperatureInfo temperatureInfo) {
 
-    private record WeatherInfo(@JsonProperty("main") String condition,
+    public record WeatherInfo(@JsonProperty("main") String condition,
                                @JsonProperty("description") String description) {
     }
 
-    private record TemperatureInfo(@JsonProperty("temp") Double temperature,
-                                   @JsonProperty("feels_like") Integer feelsLikeTemp,
-                                   @JsonProperty("humidity") Integer humidity) {
+    public record TemperatureInfo(@JsonProperty("temp") Double temperature,
+                                   @JsonProperty("feels_like") Double feelsLikeTemp,
+                                   @JsonProperty("humidity") Double humidity) {
     }
 }
