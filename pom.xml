@@ -22,10 +22,13 @@
         <logback-classic.version>1.5.18</logback-classic.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <dotenv-java.version>3.2.0</dotenv-java.version>
+        <jackson-databind.version>2.19.0</jackson-databind.version>
         <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <assertj-core.version>4.0.0-M1</assertj-core.version>
         <mockito.version>5.17.0</mockito.version>
         <h2.version>2.3.232</h2.version>
+        <wiremock.version>3.13.0</wiremock.version>
 
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -122,6 +125,16 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>${dotenv-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
+        </dependency>
 
         <!--Tests-->
         <dependency>
@@ -166,8 +179,13 @@
             <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

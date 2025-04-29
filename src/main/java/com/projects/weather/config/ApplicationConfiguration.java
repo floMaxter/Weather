@@ -1,7 +1,9 @@
 package com.projects.weather.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
@@ -27,6 +30,7 @@ public class ApplicationConfiguration {
 
     private final ApplicationContext applicationContext;
     private final Environment env;
+    private static final Dotenv dotenv = Dotenv.load();
 
     @Autowired
     public ApplicationConfiguration(ApplicationContext applicationContext, Environment env) {
@@ -38,9 +42,9 @@ public class ApplicationConfiguration {
     public DataSource dataSource() {
         var dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(env.getRequiredProperty("hibernate.driver_class"));
-        dataSource.setUrl(env.getRequiredProperty("hibernate.connection.url"));
-        dataSource.setUsername(env.getRequiredProperty("hibernate.connection.username"));
-        dataSource.setPassword(env.getRequiredProperty("hibernate.connection.password"));
+        dataSource.setUrl(dotenv.get("DB_URL"));
+        dataSource.setUsername(dotenv.get("DB_USERNAME"));
+        dataSource.setPassword(dotenv.get("DB_PASSWORD"));
         return dataSource;
     }
 
@@ -95,5 +99,17 @@ public class ApplicationConfiguration {
         viewResolver.setTemplateEngine(templateEngine());
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
+    }
+
+    @Bean
+    public RestClient restClient(@Value("${api.weather.base_url}") String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+
+    @Bean
+    public String openWeatherApiKey() {
+        return dotenv.get("OPEN_WEATHER_API_KEY");
     }
 }
