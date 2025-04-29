@@ -1,7 +1,9 @@
 package com.projects.weather.service.config;
 
+import com.projects.weather.client.OpenWeatherClient;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -9,12 +11,14 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.web.client.RestClient;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = {
+        "com.projects.weather.client",
         "com.projects.weather.service",
         "com.projects.weather.repository",
         "com.projects.weather.mapper",
@@ -64,5 +68,19 @@ public class TestAppConfig {
         liquibase.setChangeLog("classpath:db/changelog/db.changelog-master-test.yaml");
         liquibase.setShouldRun(true);
         return liquibase;
+    }
+
+    @Bean
+    public OpenWeatherClient openWeatherClient(RestClient restClient,
+                                               @Value("${api.weather.api_key}") String apiKey,
+                                               @Value("${api.weather.units_of_measurement}") String unitsOfMeasurement) {
+        return new OpenWeatherClient(restClient, apiKey, unitsOfMeasurement);
+    }
+
+    @Bean
+    public RestClient restClient(@Value("${api.weather.base_url}") String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
     }
 }
