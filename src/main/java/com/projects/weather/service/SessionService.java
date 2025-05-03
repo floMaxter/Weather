@@ -1,32 +1,30 @@
 package com.projects.weather.service;
 
 import com.projects.weather.dto.SessionDto;
-import com.projects.weather.dto.UserDto;
 import com.projects.weather.mapper.SessionMapper;
-import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.model.Session;
+import com.projects.weather.model.User;
 import com.projects.weather.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class SessionService {
 
     private final SessionRepository sessionRepository;
-    private final UserMapper userMapper;
     private final SessionMapper sessionMapper;
     private final int sessionDurationMinutes;
 
     @Autowired
     public SessionService(SessionRepository sessionRepository,
-                          UserMapper userMapper, SessionMapper sessionMapper,
+                          SessionMapper sessionMapper,
                           @Value("${session.duration}") int sessionDurationMinutes) {
         this.sessionRepository = sessionRepository;
-        this.userMapper = userMapper;
         this.sessionMapper = sessionMapper;
         this.sessionDurationMinutes = sessionDurationMinutes;
     }
@@ -50,5 +48,9 @@ public class SessionService {
 
     public void deleteAll() {
         sessionRepository.deleteAll();
+    }
+
+    public boolean isSessionExpired(Session session) {
+        return session.getExpiresAt().isBefore(LocalDateTime.now());
     }
 }

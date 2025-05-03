@@ -15,20 +15,23 @@ public class AuthService {
     private final UserService userService;
     private final SessionService sessionService;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Autowired
     public AuthService(UserService userService,
                        SessionService sessionService,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       UserMapper userMapper) {
         this.userService = userService;
         this.sessionService = sessionService;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     public UUID login(LoginRequestDto loginRequestDto) {
-        var findUserDto = userService.findByLogin(loginRequestDto.login());
-        validatePassword(loginRequestDto.password(), findUserDto.password());
-        return sessionService.save(findUserDto);
+        var user = userService.findByLogin(loginRequestDto.login());
+        validatePassword(loginRequestDto.password(), user.getPassword());
+        return sessionService.save(user);
     }
 
     public void logout(UUID sessionId) {
@@ -36,12 +39,13 @@ public class AuthService {
     }
 
     public void register(RegisterRequestDto registerRequestDto) {
-        var hashedPassword = passwordEncoder.encode(registerRequestDto.password());
-        userService.save(new UserDto(null, registerRequestDto.login(), hashedPassword));
+        var user = userMapper.fromRegisterRequest(registerRequestDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userService.save(user);
     }
 
-    private void validatePassword(String rowPassword, String encryptPassword) {
-        if (!passwordEncoder.matches(rowPassword, encryptPassword)) {
+    private void validatePassword(String rawPassword, String encryptPassword) {
+        if (!passwordEncoder.matches(rawPassword, encryptPassword)) {
             throw new RuntimeException("Incorrect password");
         }
     }
