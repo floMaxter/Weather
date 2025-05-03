@@ -27,10 +27,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringJUnitConfig(classes = TestAppConfig.class)
 public class AuthServiceIT {
 
-    private final AuthService authService;
     private final UserService userService;
     private final SessionService sessionService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     private static final String TEST_LOGIN = "test_login";
     private static final String TEST_PASSWORD = "test_password";
@@ -44,10 +44,10 @@ public class AuthServiceIT {
         authService.register(registerRequestDto);
 
         // then
-        var savedUserDto = userService.findByLogin(TEST_LOGIN);
-        assertThat(savedUserDto).isNotNull();
-        assertThat(savedUserDto.login()).isEqualTo(TEST_LOGIN);
-        assertThat(passwordEncoder.matches(TEST_PASSWORD, savedUserDto.password())).isTrue();
+        var savedUser = userService.findByLogin(TEST_LOGIN);
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getLogin()).isEqualTo(TEST_LOGIN);
+        assertThat(passwordEncoder.matches(TEST_PASSWORD, savedUser.getPassword())).isTrue();
     }
 
     @Test
@@ -76,7 +76,7 @@ public class AuthServiceIT {
         // then
         var createdSessionDto = sessionService.findById(actualSessionId);
         assertThat(createdSessionDto).isNotNull();
-        assertThat(savedUserDto.id()).isEqualTo(createdSessionDto.userId());
+        assertThat(savedUserDto.getId()).isEqualTo(createdSessionDto.userId());
         assertThat(createdSessionDto.expiresAt()).isAfter(LocalDateTime.now());
     }
 

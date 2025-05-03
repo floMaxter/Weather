@@ -1,11 +1,10 @@
 package com.projects.weather.service;
 
 
-import com.projects.weather.dto.LoginRequestDto;
-import com.projects.weather.dto.RegisterRequestDto;
-import com.projects.weather.dto.UserDto;
 import com.projects.weather.dto.request.LoginRequestDto;
 import com.projects.weather.dto.request.RegisterRequestDto;
+import com.projects.weather.mapper.UserMapper;
+import com.projects.weather.model.User;
 import com.projects.weather.security.PasswordEncoder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +25,7 @@ class AuthServiceTest {
 
     public static final String LOGIN = "login";
     public static final String PASSWORD = "password";
+    public static final String INVALID_PASSWORD = "invalid_password";
     public static final String HASHED_PASSWORD = "hashed_password";
 
     @Mock
@@ -34,6 +34,8 @@ class AuthServiceTest {
     private SessionService sessionService;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
     private AuthService authService;
 
@@ -44,13 +46,17 @@ class AuthServiceTest {
         var sessionId = UUID.randomUUID();
 
         var loginRequestDto = new LoginRequestDto(LOGIN, PASSWORD);
-        var foundUserDto = new UserDto(userId, LOGIN, HASHED_PASSWORD);
+        var user = User.builder()
+                .id(userId)
+                .login(LOGIN)
+                .password(HASHED_PASSWORD)
+                .build();
 
         when(userService.findByLogin(LOGIN))
-                .thenReturn(foundUserDto);
+                .thenReturn(user);
         when(passwordEncoder.matches(PASSWORD, HASHED_PASSWORD))
                 .thenReturn(true);
-        when(sessionService.save(foundUserDto))
+        when(sessionService.save(user))
                 .thenReturn(sessionId);
 
         // when
@@ -60,19 +66,23 @@ class AuthServiceTest {
         assertThat(actualSessionId).isEqualTo(sessionId);
         verify(userService).findByLogin(LOGIN);
         verify(passwordEncoder).matches(PASSWORD, HASHED_PASSWORD);
-        verify(sessionService).save(foundUserDto);
+        verify(sessionService).save(user);
     }
 
     @Test
     void login_EnterInvalidPassword_ShouldThrowRuntimeException() {
         // given
         var userId = 1L;
-        var loginRequestDto = new LoginRequestDto(LOGIN, PASSWORD);
-        var foundUserDto = new UserDto(userId, LOGIN, HASHED_PASSWORD);
+        var loginRequestDto = new LoginRequestDto(LOGIN, INVALID_PASSWORD);
+        var user = User.builder()
+                .id(userId)
+                .login(LOGIN)
+                .password(HASHED_PASSWORD)
+                .build();
 
         when(userService.findByLogin(LOGIN))
-                .thenReturn(foundUserDto);
-        when(passwordEncoder.matches(PASSWORD, HASHED_PASSWORD))
+                .thenReturn(user);
+        when(passwordEncoder.matches(INVALID_PASSWORD, HASHED_PASSWORD))
                 .thenReturn(false);
 
         // when
@@ -83,8 +93,8 @@ class AuthServiceTest {
                 .hasMessage("Incorrect password");
 
         verify(userService).findByLogin(LOGIN);
-        verify(passwordEncoder).matches(PASSWORD, HASHED_PASSWORD);
-        verify(sessionService, never()).save(foundUserDto);
+        verify(passwordEncoder).matches(INVALID_PASSWORD, HASHED_PASSWORD);
+        verify(sessionService, never()).save(user);
     }
 
     @Test
@@ -98,8 +108,13 @@ class AuthServiceTest {
     void register_ShouldCallSaveFromUserService() {
         // given
         var registerRequestDto = new RegisterRequestDto(LOGIN, PASSWORD);
-        var newUserDto = new UserDto(null, LOGIN, HASHED_PASSWORD);
+        var user = User.builder()
+                .login(LOGIN)
+                .password(PASSWORD)
+                .build();
 
+        when(userMapper.fromRegisterRequest(registerRequestDto))
+                .thenReturn(user);
         when(passwordEncoder.encode(PASSWORD))
                 .thenReturn(HASHED_PASSWORD);
 
@@ -107,6 +122,6 @@ class AuthServiceTest {
         authService.register(registerRequestDto);
 
         // then
-        verify(userService).save(newUserDto);
+        verify(userService).save(user);
     }
 }
