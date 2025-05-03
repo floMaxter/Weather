@@ -1,7 +1,7 @@
 package com.projects.weather.service.integration.service;
 
-import com.projects.weather.dto.LoginRequestDto;
-import com.projects.weather.dto.RegisterRequestDto;
+import com.projects.weather.dto.request.LoginRequestDto;
+import com.projects.weather.dto.request.RegisterRequestDto;
 import com.projects.weather.security.PasswordEncoder;
 import com.projects.weather.service.AuthService;
 import com.projects.weather.service.SessionService;

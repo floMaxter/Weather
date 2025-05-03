@@ -4,6 +4,8 @@ package com.projects.weather.service;
 import com.projects.weather.dto.LoginRequestDto;
 import com.projects.weather.dto.RegisterRequestDto;
 import com.projects.weather.dto.UserDto;
+import com.projects.weather.dto.request.LoginRequestDto;
+import com.projects.weather.dto.request.RegisterRequestDto;
 import com.projects.weather.security.PasswordEncoder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

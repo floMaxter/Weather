@@ -1,7 +1,7 @@
 package com.projects.weather.controller;
 
-import com.projects.weather.dto.LoginRequestDto;
-import com.projects.weather.dto.RegisterRequestDto;
+import com.projects.weather.dto.request.LoginRequestDto;
+import com.projects.weather.dto.request.RegisterRequestDto;
 import com.projects.weather.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

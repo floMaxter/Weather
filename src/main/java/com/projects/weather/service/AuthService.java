@@ -1,8 +1,8 @@
 package com.projects.weather.service;
 
-import com.projects.weather.dto.LoginRequestDto;
-import com.projects.weather.dto.RegisterRequestDto;
-import com.projects.weather.dto.UserDto;
+import com.projects.weather.dto.request.LoginRequestDto;
+import com.projects.weather.dto.request.RegisterRequestDto;
+import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.security.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
