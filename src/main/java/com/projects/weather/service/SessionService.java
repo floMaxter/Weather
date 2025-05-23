@@ -8,6 +8,7 @@ import com.projects.weather.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -30,22 +31,24 @@ public class SessionService {
     }
 
     public SessionDto findById(UUID id) {
+    @Transactional(readOnly = true)
         return sessionRepository.findById(id)
                 .map(sessionMapper::mapTo)
                 .orElseThrow(() -> new RuntimeException("The session with this id was not found: " + id));
     }
 
-    public UUID save(UserDto userDto) {
-        var user = userMapper.mapFrom(userDto);
-        var expiresAt = LocalDateTime.now().plusMinutes(sessionDurationMinutes);
-        var session = sessionRepository.save(new Session(user, expiresAt));
+    @Transactional
+    public UUID create(User user) {
+        var session = sessionRepository.save(new Session(user, calculateExpiresAt()));
         return session.getId();
     }
 
+    @Transactional
     public void delete(UUID id) {
         sessionRepository.delete(id);
     }
 
+    @Transactional
     public void deleteAll() {
         sessionRepository.deleteAll();
     }

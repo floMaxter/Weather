@@ -6,6 +6,7 @@ import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.security.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -28,16 +29,20 @@ public class AuthService {
         this.userMapper = userMapper;
     }
 
+
+    @Transactional
     public UUID login(LoginRequestDto loginRequestDto) {
         var user = userService.findByLogin(loginRequestDto.login());
         validatePassword(loginRequestDto.password(), user.getPassword());
         return sessionService.save(user);
     }
 
+    @Transactional
     public void logout(UUID sessionId) {
         sessionService.delete(sessionId);
     }
 
+    @Transactional
     public void register(RegisterRequestDto registerRequestDto) {
         var user = userMapper.fromRegisterRequest(registerRequestDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
