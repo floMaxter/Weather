@@ -30,11 +30,10 @@ public class SessionService {
         this.sessionDurationMinutes = sessionDurationMinutes;
     }
 
-    public SessionDto findById(UUID id) {
     @Transactional(readOnly = true)
+    public Optional<SessionDto> findById(UUID id) {
         return sessionRepository.findById(id)
-                .map(sessionMapper::mapTo)
-                .orElseThrow(() -> new RuntimeException("The session with this id was not found: " + id));
+                .map(sessionMapper::mapTo);
     }
 
     @Transactional
@@ -53,7 +52,11 @@ public class SessionService {
         sessionRepository.deleteAll();
     }
 
-    public boolean isSessionExpired(Session session) {
-        return session.getExpiresAt().isBefore(LocalDateTime.now());
+    private LocalDateTime calculateExpiresAt() {
+        return LocalDateTime.now().plusMinutes(sessionDurationMinutes);
+    }
+
+    public boolean isSessionExpired(SessionDto session) {
+        return session.expiresAt().isBefore(LocalDateTime.now());
     }
 }

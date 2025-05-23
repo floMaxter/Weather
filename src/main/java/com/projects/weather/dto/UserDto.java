@@ -1,4 +1,12 @@
 package com.projects.weather.dto;
 
-public record UserDto(Long id, String login, String password) {
+import lombok.Builder;
+
+import java.util.List;
+
+@Builder
+public record UserDto(Long id,
+                      String login,
+                      String password,
+                      List<LocationDto> locations) {
 }

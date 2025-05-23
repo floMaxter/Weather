@@ -2,6 +2,7 @@ package com.projects.weather.service;
 
 import com.projects.weather.model.User;
 import com.projects.weather.repository.UserRepository;
+import com.projects.weather.security.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -28,13 +31,12 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("The user with this login was not found: " + login));
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public void save(User user) {
-        userRepository.save(user);
     @Transactional
+    public void create(String login, String password) {
+        userRepository.save(User.builder()
+                .login(login)
+                .password(passwordEncoder.encode(password))
+                .build());
     }
 
     @Transactional

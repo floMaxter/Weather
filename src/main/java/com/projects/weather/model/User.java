@@ -18,7 +18,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "locations")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
