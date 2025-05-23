@@ -1,14 +1,18 @@
 package com.projects.weather.repository;
 
+import com.projects.weather.exception.DatabaseException;
 import com.projects.weather.model.Identifiable;
+import com.projects.weather.util.DaoRetriever;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -16,95 +20,60 @@ import java.util.Optional;
 public abstract class AbstractHibernateRepository<K extends Serializable, E extends Identifiable<K>>
         implements GenericRepository<K, E> {
 
-    protected final SessionFactory sessionFactory;
+    @PersistenceContext
+    protected EntityManager entityManager;
     protected final Class<E> entityClass;
 
     @Autowired
-    protected AbstractHibernateRepository(SessionFactory sessionFactory, Class<E> entityClass) {
-        this.sessionFactory = sessionFactory;
+    protected AbstractHibernateRepository(Class<E> entityClass) {
         this.entityClass = entityClass;
     }
 
     @Override
     public Optional<E> findById(K id) {
-        try (var session = sessionFactory.openSession()) {
-            return Optional.ofNullable(session.find(entityClass, id));
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+        return Optional.ofNullable(entityManager.find(entityClass, id));
     }
 
     @Override
     public List<E> findAll() {
-        try (var session = sessionFactory.openSession()) {
-            var criteria = session.getCriteriaBuilder().createQuery(entityClass);
-            criteria.select(criteria.from(entityClass));
-            return session.createQuery(criteria).getResultList();
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+        var criteria = entityManager.getCriteriaBuilder().createQuery(entityClass);
+        criteria.select(criteria.from(entityClass));
+        return entityManager.createQuery(criteria).getResultList();
     }
 
     @Override
     public E save(E entity) {
-        Transaction transaction = null;
-        try (var session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.persist(entity);
-            transaction.commit();
-
-            return entity;
-        } catch (RuntimeException e) {
-            log.error("Error saving the entity {}", entity);
-            rollbackTransaction(transaction);
-
-            throw new RuntimeException(e);
-        }
+        entityManager.persist(entity);
+        return entity;
     }
 
     @Override
     public void delete(K id) {
-        try (var session = sessionFactory.openSession()) {
-            var transaction = session.beginTransaction();
-
-            var entity = session.find(entityClass, id);
-            if (entity != null) {
-                session.remove(entity);
-            }
-
-            transaction.commit();
+        var entity = entityManager.find(entityClass, id);
+        if (entity != null) {
+            entityManager.remove(entity);
+            entityManager.flush();
         }
     }
 
     @Override
     public void deleteAll() {
-        Transaction transaction = null;
-        try (var session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-
-            var entities = findAll();
-            for (var entity : entities) {
-                session.remove(entity);
-                session.flush();
-                session.clear();
-            }
-
-            transaction.commit();
-        } catch (RuntimeException e) {
-            log.error("Error deleting all entities of type {}", entityClass.getSimpleName());
-            rollbackTransaction(transaction);
-            throw new RuntimeException(e);
+        var entities = findAll();
+        for (var entity : entities) {
+            entityManager.remove(entity);
+            entityManager.flush();
         }
     }
 
-    private void rollbackTransaction(Transaction transaction) {
-        if (transaction != null && transaction.isActive()) {
-            try {
-                log.info("Rollback transaction");
-                transaction.rollback();
-            } catch (Exception e) {
-                log.error("Failed to rollback transaction");
-            }
+    protected Optional<E> findOrEmpty(DaoRetriever<E> retriever) {
+        try {
+            return Optional.of(retriever.retrieve());
+        } catch (NoSuchElementException e) {
+            log.debug("No result found", e);
+            return Optional.empty();
+        } catch (NonUniqueResultException e) {
+            log.error("Multiple result found when single was expected", e);
+            throw new DatabaseException("Multiple result found when single was expected", e);
         }
     }
 }
