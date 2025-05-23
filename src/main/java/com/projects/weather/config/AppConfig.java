@@ -1,5 +1,6 @@
 package com.projects.weather.config;
 
+import com.projects.weather.interceptor.AuthInterceptor;
 import io.github.cdimascio.dotenv.Dotenv;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
@@ -34,12 +36,14 @@ import java.util.Properties;
 public class AppConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
+    private final AuthInterceptor authInterceptor;
     private final Environment env;
     private static final Dotenv dotenv = Dotenv.load();
 
     @Autowired
-    public ApplicationConfiguration(ApplicationContext applicationContext, Environment env) {
+    public AppConfig(ApplicationContext applicationContext, AuthInterceptor authInterceptor, Environment env) {
         this.applicationContext = applicationContext;
+        this.authInterceptor = authInterceptor;
         this.env = env;
     }
 
@@ -123,5 +127,12 @@ public class AppConfig implements WebMvcConfigurer {
     @Bean
     public String openWeatherApiKey() {
         return dotenv.get("OPEN_WEATHER_API_KEY");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/auth/**");
     }
 }

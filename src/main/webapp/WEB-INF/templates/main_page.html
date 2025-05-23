@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Main page</title>
+    </head>
+    <body>
+        <header>
+            <a th:href="@{/auth/register}">
+                <button type="button">Register</button>
+            </a>
+            <a th:href="@{/auth/login}">
+                <button type="button">Login</button>
+            </a>
+            <a th:href="@{/auth/logout}">
+                <button type="button">Logout</button>
+            </a>
+        </header>
+        <main>
+
+            <form th:action="@{/locations/}">
+
+            </form>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Locations</title>
+    </head>
+    <body>
+        <header>
+            <a th:href="@{/auth/register}">
+                <button type="button">Register</button>
+            </a>
+            <a th:href="@{/auth/login}">
+                <button type="button">Login</button>
+            </a>
+            <a th:href="@{/auth/logout}">
+                <button type="button">Logout</button>
+            </a>
+        </header>
+        <main>
+            <div th:each="location : ${locations}">
+                <p th:text="${location.name()}">locationName</p>
+                <p th:text="${location.longitude()}">longitude</p>
+                <p th:text="${location.latitude()}">latitude</p>
+                <p th:text="${location.country()}">country</p>
+                <p th:text="${location.state()}">state</p>
+
+                <form th:action="@{/locations/save}" method="post">
+                    <input type="hidden" name="name" th:value="${location.name()}">
+                    <input type="hidden" name="longitude" th:value="${location.longitude()}">
+                    <input type="hidden" name="latitude" th:value="${location.latitude()}">
+                    <button type="submit">Сохранить</button>
+                </form>
+                <hr/>
+            </div>
+        </main>
+    </body>
+</html>

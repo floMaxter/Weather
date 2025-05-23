@@ -39,17 +39,19 @@ public class AuthController {
     @PostMapping("/login")
     public String login(@ModelAttribute("user") LoginRequestDto loginRequestDto, HttpServletResponse resp) {
         var sessionId = authService.login(loginRequestDto);
-        var userSessionIdCookie = new Cookie(USER_SESSION_ID, sessionId.toString());
-        userSessionIdCookie.setPath("/");
-        resp.addCookie(userSessionIdCookie);
 
-        return "redirect:/users";
+        var sessionCookie = new Cookie(USER_SESSION_ID, sessionId.toString());
+        sessionCookie.setPath("/");
+        resp.addCookie(sessionCookie);
+
+        return "redirect:/weather";
     }
 
     @PostMapping("/logout")
     public String logout(@CookieValue(USER_SESSION_ID) String userSessionId,
                          HttpServletResponse resp) {
         authService.logout(UUID.fromString(userSessionId));
+
         var expiredCookie = new Cookie(USER_SESSION_ID, null);
         expiredCookie.setMaxAge(0);
         expiredCookie.setPath("/");
