@@ -1,4 +1,4 @@
-package com.projects.weather.interceptor;
+package com.projects.weather.web.interceptor;
 
 import com.projects.weather.service.AuthService;
 import com.projects.weather.util.SessionCookieUtils;

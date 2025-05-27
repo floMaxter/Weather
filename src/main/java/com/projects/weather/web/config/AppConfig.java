@@ -1,6 +1,6 @@
-package com.projects.weather.config;
+package com.projects.weather.web.config;
 
-import com.projects.weather.interceptor.AuthInterceptor;
+import com.projects.weather.web.interceptor.AuthInterceptor;
 import io.github.cdimascio.dotenv.Dotenv;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +87,7 @@ public class AppConfig implements WebMvcConfigurer {
         var liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource());
         liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.yaml");
+        liquibase.setShouldRun(false);
         return liquibase;
     }
 

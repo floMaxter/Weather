@@ -1,4 +1,4 @@
-package com.projects.weather.controller;
+package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.request.LoginRequestDto;
 import com.projects.weather.dto.request.RegisterRequestDto;

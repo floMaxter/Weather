@@ -1,4 +1,4 @@
-package com.projects.weather.config;
+package com.projects.weather.web.config;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;

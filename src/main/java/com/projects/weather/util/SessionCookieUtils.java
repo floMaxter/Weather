@@ -1,6 +1,6 @@
 package com.projects.weather.util;
 
-import com.projects.weather.config.SessionProperties;
+import com.projects.weather.web.config.SessionProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
