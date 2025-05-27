@@ -3,13 +3,13 @@ package com.projects.weather.controller;
 import com.projects.weather.dto.request.LoginRequestDto;
 import com.projects.weather.dto.request.RegisterRequestDto;
 import com.projects.weather.service.AuthService;
-import jakarta.servlet.http.Cookie;
+import com.projects.weather.util.SessionCookieUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,11 +23,12 @@ import java.util.UUID;
 public class AuthController {
 
     private final AuthService authService;
-    private static final String USER_SESSION_ID = "USERSESSIONID";
+    private final SessionCookieUtils sessionCookieUtils;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, SessionCookieUtils sessionCookieUtils) {
         this.authService = authService;
+        this.sessionCookieUtils = sessionCookieUtils;
     }
 
     @GetMapping("/login")
@@ -39,23 +40,16 @@ public class AuthController {
     @PostMapping("/login")
     public String login(@ModelAttribute("user") LoginRequestDto loginRequestDto, HttpServletResponse resp) {
         var sessionId = authService.login(loginRequestDto);
-
-        var sessionCookie = new Cookie(USER_SESSION_ID, sessionId.toString());
-        sessionCookie.setPath("/");
-        resp.addCookie(sessionCookie);
+        sessionCookieUtils.setSessionCookie(resp, sessionId);
 
         return "redirect:/weather";
     }
 
     @PostMapping("/logout")
-    public String logout(@CookieValue(USER_SESSION_ID) String userSessionId,
-                         HttpServletResponse resp) {
-        authService.logout(UUID.fromString(userSessionId));
-
-        var expiredCookie = new Cookie(USER_SESSION_ID, null);
-        expiredCookie.setMaxAge(0);
-        expiredCookie.setPath("/");
-        resp.addCookie(expiredCookie);
+    public String logout(HttpServletRequest req, HttpServletResponse resp) {
+        sessionCookieUtils.getSessionCookie(req).ifPresent(cookie ->
+                authService.logout(UUID.fromString(cookie.getValue())));
+        sessionCookieUtils.expireSessionCookie(resp);
 
         return "redirect:/auth/login";
     }

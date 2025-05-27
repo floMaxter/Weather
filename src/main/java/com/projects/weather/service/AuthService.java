@@ -2,7 +2,7 @@ package com.projects.weather.service;
 
 import com.projects.weather.dto.request.LoginRequestDto;
 import com.projects.weather.dto.request.RegisterRequestDto;
-import com.projects.weather.dto.response.UserResponseDto;
+import com.projects.weather.dto.response.AuthorizedUserDto;
 import com.projects.weather.exception.InvalidPasswordException;
 import com.projects.weather.exception.NotFoundException;
 import com.projects.weather.mapper.UserMapper;
@@ -66,7 +66,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserResponseDto> findAuthorizedUserBySessionId(UUID sessionId) {
+    public Optional<AuthorizedUserDto> findAuthorizedUserBySessionId(UUID sessionId) {
         var maybeSession = sessionRepository.findById(sessionId);
         if (maybeSession.isPresent()) {
             var session = maybeSession.get();
