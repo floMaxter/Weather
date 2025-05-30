@@ -1,6 +1,7 @@
 package com.projects.weather.web.config;
 
 import com.projects.weather.web.interceptor.AuthInterceptor;
+import com.projects.weather.web.resolver.AuthorizedUserArgumentResolver;
 import io.github.cdimascio.dotenv.Dotenv;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -26,6 +28,7 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Properties;
 
 @Configuration
@@ -37,13 +40,18 @@ public class AppConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
     private final AuthInterceptor authInterceptor;
+    private final AuthorizedUserArgumentResolver authorizedUserArgumentResolver;
     private final Environment env;
     private static final Dotenv dotenv = Dotenv.load();
 
     @Autowired
-    public AppConfig(ApplicationContext applicationContext, AuthInterceptor authInterceptor, Environment env) {
+    public AppConfig(ApplicationContext applicationContext,
+                     AuthInterceptor authInterceptor,
+                     AuthorizedUserArgumentResolver authorizedUserArgumentResolver,
+                     Environment env) {
         this.applicationContext = applicationContext;
         this.authInterceptor = authInterceptor;
+        this.authorizedUserArgumentResolver = authorizedUserArgumentResolver;
         this.env = env;
     }
 
@@ -119,7 +127,7 @@ public class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public RestClient restClient(@Value("${api.weather.base_url}") String baseUrl) {
+    public RestClient restClient(@Value("${open_weather_api.weather.base_url}") String baseUrl) {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
@@ -135,5 +143,10 @@ public class AppConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/auth/**");
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(authorizedUserArgumentResolver);
     }
 }
