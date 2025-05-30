@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Weather</title>
+    </head>
+    <body>
+        <div th:replace="~{fragment/header :: header}"></div>
+        <main>
+            <form th:method="get" th:action="@{/locations}">
+                <label for="search">Search</label><br/>
+                <input id="search" type="text" name="location" placeholder="Enter location name"/><br/>
+                <button type="submit">Search</button>
+            </form>
+            <div th:if="${userDto != null}">
+                <ul th:if="${locationsWithWeather != null and !locationsWithWeather.isEmpty}">
+                    <li th:each="location: ${locationsWithWeather}">
+                        <span th:text="${location.weatherInfo.iconId}"></span>
+                        <span th:text="${location.temperatureInfo.temperature}"></span>
+                        <span th:text="${location.name}"></span>
+                        <span th:text="${location.countyCode}"></span>
+                        Feels like <span th:text="${location.temperatureInfo.temperature}"></span>
+                        <span th:text="${location.weatherInfo.description}"></span>
+                        Humidity: <span th:text="${location.temperatureInfo.humidity()}"></span>%
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </body>
+</html>

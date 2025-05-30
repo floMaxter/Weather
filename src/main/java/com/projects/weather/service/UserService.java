@@ -1,8 +1,11 @@
 package com.projects.weather.service;
 
-import com.projects.weather.model.User;
+import com.projects.weather.dto.location.internal.LocationWithCoordinatesDto;
+import com.projects.weather.dto.user.response.UserWithLocationsDto;
+import com.projects.weather.mapper.UserMapper;
+import com.projects.weather.model.Location;
+import com.projects.weather.repository.LocationRepository;
 import com.projects.weather.repository.UserRepository;
-import com.projects.weather.security.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,23 +14,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final LocationRepository locationRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       LocationRepository locationRepository,
+                       UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.locationRepository = locationRepository;
+        this.userMapper = userMapper;
     }
 
     @Transactional(readOnly = true)
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("The user with this id was not found: " + id));
-    }
-
-    @Transactional(readOnly = true)
-    public User findByLogin(String login) {
+    public UserWithLocationsDto findByLogin(String login) {
         return userRepository.findByLogin(login)
+                .map(userMapper::toUserWithLocationsDto)
                 .orElseThrow(() -> new RuntimeException("The user with this login was not found: " + login));
     }
 

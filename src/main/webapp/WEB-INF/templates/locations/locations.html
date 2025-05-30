@@ -5,18 +5,13 @@
         <title>Locations</title>
     </head>
     <body>
-        <header>
-            <a th:href="@{/auth/register}">
-                <button type="button">Register</button>
-            </a>
-            <a th:href="@{/auth/login}">
-                <button type="button">Login</button>
-            </a>
-            <a th:href="@{/auth/logout}">
-                <button type="button">Logout</button>
-            </a>
-        </header>
+        <div th:replace="~{fragment/header :: header}"></div>
         <main>
+            <form th:method="get" th:action="@{/locations/search}">
+                <label for="search">Search</label><br/>
+                <input id="search" type="text" name="location" placeholder="Enter location name"/><br/>
+                <button type="submit">Search</button>
+            </form>
             <div th:each="location : ${locations}">
                 <p th:text="${location.name()}">locationName</p>
                 <p th:text="${location.longitude()}">longitude</p>
@@ -24,7 +19,7 @@
                 <p th:text="${location.country()}">country</p>
                 <p th:text="${location.state()}">state</p>
 
-                <form th:action="@{/locations/save}" method="post">
+                <form th:action="@{/locations}" method="post">
                     <input type="hidden" name="name" th:value="${location.name()}">
                     <input type="hidden" name="longitude" th:value="${location.longitude()}">
                     <input type="hidden" name="latitude" th:value="${location.latitude()}">
