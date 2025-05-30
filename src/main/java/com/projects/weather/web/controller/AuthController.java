@@ -1,7 +1,7 @@
 package com.projects.weather.web.controller;
 
-import com.projects.weather.dto.request.LoginRequestDto;
-import com.projects.weather.dto.request.RegisterRequestDto;
+import com.projects.weather.dto.user.request.LoginRequestDto;
+import com.projects.weather.dto.user.request.RegisterRequestDto;
 import com.projects.weather.service.AuthService;
 import com.projects.weather.util.SessionCookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ public class AuthController {
         var sessionId = authService.login(loginRequestDto);
         sessionCookieUtils.setSessionCookie(resp, sessionId);
 
-        return "redirect:/weather";
+        return "redirect:/locations/weather";
     }
 
     @PostMapping("/logout")

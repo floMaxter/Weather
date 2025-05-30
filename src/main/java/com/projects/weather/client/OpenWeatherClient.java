@@ -1,8 +1,8 @@
 package com.projects.weather.client;
 
 
-import com.projects.weather.dto.LocationResponseDto;
-import com.projects.weather.dto.WeatherDataResponseDto;
+import com.projects.weather.dto.external.openweather.CurrentWeatherResponseDto;
+import com.projects.weather.dto.external.openweather.LocationSearchResponseDto;
 import com.projects.weather.exception.OpenWeatherClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,23 +21,26 @@ public class OpenWeatherClient {
     private final RestClient restClient;
     private final String openWeatherApiKey;
     private final String unitsOfMeasurement;
+    private final int locationSearchLimit;
 
     @Autowired
     public OpenWeatherClient(RestClient restClient,
                              String openWeatherApiKey,
-                             @Value("${api.weather.units_of_measurement}") String unitsOfMeasurement) {
+                             @Value("${open_weather_api.weather.units_of_measurement}") String unitsOfMeasurement,
+                             @Value("${open_weather_api.location.search_limit}") int locationSearchLimit) {
         this.restClient = restClient;
         this.openWeatherApiKey = openWeatherApiKey;
         this.unitsOfMeasurement = unitsOfMeasurement;
+        this.locationSearchLimit = locationSearchLimit;
     }
 
-    public List<LocationResponseDto> findAllLocationsByName(String name, int limit) {
+    public List<LocationSearchResponseDto> findAllLocationsByName(String name) {
         try {
             var locations = restClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/geo/1.0/direct")
                             .queryParam("q", name)
-                            .queryParam("limit", limit)
+                            .queryParam("limit", locationSearchLimit)
                             .queryParam("appid", openWeatherApiKey)
                             .build())
                     .retrieve()
@@ -49,7 +52,7 @@ public class OpenWeatherClient {
                         throw new OpenWeatherClientException("Server error from OpenWeather API: "
                                                              + resp.getStatusText() + " - " + resp.getStatusCode());
                     }))
-                    .body(LocationResponseDto[].class);
+                    .body(LocationSearchResponseDto[].class);
 
             return locations != null ? Arrays.asList(locations) : Collections.emptyList();
         } catch (RestClientException e) {
@@ -57,7 +60,7 @@ public class OpenWeatherClient {
         }
     }
 
-    public WeatherDataResponseDto findWeatherDataByCoordinates(Double latitude, Double longitude) {
+    public CurrentWeatherResponseDto findWeatherDataByCoordinates(Double latitude, Double longitude) {
         try {
             var response = restClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -76,7 +79,7 @@ public class OpenWeatherClient {
                         throw new OpenWeatherClientException("Server error from OpenWeather API: "
                                                              + resp.getStatusText() + " - " + resp.getStatusCode());
                     }))
-                    .body(WeatherDataResponseDto.class);
+                    .body(CurrentWeatherResponseDto.class);
 
             if (response == null) {
                 throw new OpenWeatherClientException("OpenWeather API returned empty response");

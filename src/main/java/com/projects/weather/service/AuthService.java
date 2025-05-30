@@ -1,8 +1,8 @@
 package com.projects.weather.service;
 
-import com.projects.weather.dto.request.LoginRequestDto;
-import com.projects.weather.dto.request.RegisterRequestDto;
-import com.projects.weather.dto.response.AuthorizedUserDto;
+import com.projects.weather.dto.user.request.LoginRequestDto;
+import com.projects.weather.dto.user.request.RegisterRequestDto;
+import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.exception.InvalidPasswordException;
 import com.projects.weather.exception.NotFoundException;
 import com.projects.weather.mapper.UserMapper;
@@ -32,7 +32,8 @@ public class AuthService {
     public AuthService(SessionRepository sessionRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       UserMapper userMapper, @Value("${session.duration}") int sessionDurationMinutes) {
+                       UserMapper userMapper,
+                       @Value("${session.duration}") int sessionDurationMinutes) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -67,16 +68,12 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public Optional<AuthorizedUserDto> findAuthorizedUserBySessionId(UUID sessionId) {
-        var maybeSession = sessionRepository.findById(sessionId);
-        if (maybeSession.isPresent()) {
-            var session = maybeSession.get();
-            if (!isSessionExpired(session)) {
-                var authorizedUser = session.getUser();
-                return Optional.of(userMapper.toDto(authorizedUser));
-            }
-        }
-
-        return Optional.empty();
+        return sessionRepository.findById(sessionId)
+                .filter(session -> !isSessionExpired(session))
+                .map(session -> {
+                    var user = session.getUser();
+                    return new AuthorizedUserDto(user.getLogin(), user.getPassword());
+                });
     }
 
     private void checkPassword(LoginRequestDto loginRequestDto, User user) {
