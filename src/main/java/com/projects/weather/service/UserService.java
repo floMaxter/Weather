@@ -1,8 +1,8 @@
 package com.projects.weather.service;
 
-import com.projects.weather.dto.location.internal.LocationWithCoordinatesDto;
 import com.projects.weather.dto.location.request.CreateLocationRequestDto;
 import com.projects.weather.dto.user.response.UserWithLocationsDto;
+import com.projects.weather.exception.NotFoundException;
 import com.projects.weather.mapper.LocationMapper;
 import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.repository.UserRepository;
@@ -30,13 +30,13 @@ public class UserService {
     public UserWithLocationsDto findByLogin(String login) {
         return userRepository.findByLogin(login)
                 .map(userMapper::toUserWithLocationsDto)
-                .orElseThrow(() -> new RuntimeException("The user with this login was not found: " + login));
+                .orElseThrow(() -> new NotFoundException("The user with this login was not found: " + login));
     }
 
     @Transactional
     public void addLocationToUser(String login, CreateLocationRequestDto locationDto) {
         var user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new RuntimeException("The user with this login was not found: " + login));
+                .orElseThrow(() -> new NotFoundException("The user with this login was not found: " + login));
 
         var location = locationMapper.toLocation(locationDto, user);
         user.addLocation(location);
@@ -44,9 +44,15 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        userRepository.delete(id);
-    }
+    public void removeLocationsFromUser(String login, Long locationId) {
+        var user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("The user with this login was not found: " + login));
 
+        var deletedLocation = user.getLocations().stream()
+                .filter(location -> location.getId().equals(locationId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("The location with this id was not found: " + locationId));
+
+        user.removeLocation(deletedLocation);
     }
 }

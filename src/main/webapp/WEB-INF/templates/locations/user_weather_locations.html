@@ -22,6 +22,11 @@
                         Feels like <span th:text="${location.temperatureInfo.temperature}"></span>
                         <span th:text="${location.weatherInfo.description}"></span>
                         Humidity: <span th:text="${location.temperatureInfo.humidity()}"></span>%
+
+                        <form th:action="@{/locations/{id}(id=${location.id})}" method="post">
+                            <input type="hidden" name="_method" value="delete"/>
+                            <button type="submit">Delete</button>
+                        </form>
                     </li>
                 </ul>
             </div>
