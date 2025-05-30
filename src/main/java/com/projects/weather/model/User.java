@@ -34,7 +34,6 @@ public class User implements Identifiable<Long> {
 
     private String password;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "user")
     private List<Location> locations;
 }
