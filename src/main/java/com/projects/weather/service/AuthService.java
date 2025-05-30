@@ -1,11 +1,10 @@
 package com.projects.weather.service;
 
+import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.dto.user.request.LoginRequestDto;
 import com.projects.weather.dto.user.request.RegisterRequestDto;
-import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.exception.InvalidPasswordException;
 import com.projects.weather.exception.NotFoundException;
-import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.model.Session;
 import com.projects.weather.model.User;
 import com.projects.weather.repository.SessionRepository;
@@ -25,19 +24,16 @@ public class AuthService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
 
     private final int sessionDurationMinutes;
 
     public AuthService(SessionRepository sessionRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       UserMapper userMapper,
                        @Value("${session.duration}") int sessionDurationMinutes) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
         this.sessionDurationMinutes = sessionDurationMinutes;
     }
 

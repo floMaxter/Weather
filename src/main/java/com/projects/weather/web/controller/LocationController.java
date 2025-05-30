@@ -1,7 +1,6 @@
 package com.projects.weather.web.controller;
 
-import com.projects.weather.client.OpenWeatherClient;
-import com.projects.weather.dto.location.internal.LocationWithCoordinatesDto;
+import com.projects.weather.dto.location.request.CreateLocationRequestDto;
 import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.service.LocationService;
 import com.projects.weather.service.UserService;
@@ -19,14 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/locations")
 public class LocationController {
 
-    private final OpenWeatherClient openWeatherClient;
     private final UserService userService;
     private final LocationService locationService;
 
-    public LocationController(OpenWeatherClient openWeatherClient,
-                              UserService userService,
+    public LocationController(UserService userService,
                               LocationService locationService) {
-        this.openWeatherClient = openWeatherClient;
         this.userService = userService;
         this.locationService = locationService;
     }
@@ -34,10 +30,11 @@ public class LocationController {
     @GetMapping("/weather")
     public String getWeatherLocations(Model model,
                                       @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto) {
+        model.addAttribute("userDto", authorizedUserDto);
+
         if (authorizedUserDto != null) {
             var userWithLocationsDto = userService.findByLogin(authorizedUserDto.login());
-            var locationsWithWeather = locationService.getWeatherForLocations(userWithLocationsDto);
-            model.addAttribute("userDto", authorizedUserDto);
+            var locationsWithWeather = locationService.getWeatherForLocations(userWithLocationsDto.locations());
             model.addAttribute("locationsWithWeather", locationsWithWeather);
         }
 
@@ -48,23 +45,25 @@ public class LocationController {
     public String getLocations(Model model,
                                @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
                                HttpServletRequest request) {
-        var locationName = request.getParameter("location");
-        var locations = openWeatherClient.findAllLocationsByName(locationName);
-        model.addAttribute("locations", locations);
         model.addAttribute("userDto", authorizedUserDto);
+
+        var locationName = request.getParameter("location");
+        if (locationName != null) {
+            var locations = locationService.getLocationsByName(locationName);
+            model.addAttribute("locations", locations);
+        }
 
         return "locations/locations";
     }
 
     @PostMapping
-    public String addLocation(Model model,
-                              @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
-                              @ModelAttribute LocationWithCoordinatesDto locationWithCoordinatesDto) {
+    public String addLocation(@AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
+                              @ModelAttribute CreateLocationRequestDto locationRequestDto) {
         if (authorizedUserDto == null) {
             return "redirect:/auth/login";
         }
 
-        userService.addLocationToUser(authorizedUserDto.login(), locationWithCoordinatesDto);
+        userService.addLocationToUser(authorizedUserDto.login(), locationRequestDto);
 
         return "redirect:/locations/weather";
     }
