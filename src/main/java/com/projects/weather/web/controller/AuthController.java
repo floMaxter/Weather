@@ -42,7 +42,7 @@ public class AuthController {
         var sessionId = authService.login(loginRequestDto);
         sessionCookieUtils.setSessionCookie(resp, sessionId);
 
-        return "redirect:/locations/weather";
+        return "redirect:/weather";
     }
 
     @PostMapping("/logout")

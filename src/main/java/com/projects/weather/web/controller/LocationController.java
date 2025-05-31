@@ -29,24 +29,10 @@ public class LocationController {
         this.locationService = locationService;
     }
 
-    @GetMapping("/weather")
-    public String getWeatherLocations(Model model,
-                                      @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto) {
-        model.addAttribute("userDto", authorizedUserDto);
-
-        if (authorizedUserDto != null) {
-            var userWithLocationsDto = userService.findByLogin(authorizedUserDto.login());
-            var locationsWithWeather = locationService.getWeatherForLocations(userWithLocationsDto.locations());
-            model.addAttribute("locationsWithWeather", locationsWithWeather);
-        }
-
-        return "locations/user_weather_locations";
-    }
-
-    @GetMapping
-    public String getLocations(Model model,
-                               @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
-                               HttpServletRequest request) {
+    @GetMapping("/search")
+    public String searchLocations(Model model,
+                                  @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
+                                  HttpServletRequest request) {
         model.addAttribute("userDto", authorizedUserDto);
 
         var locationName = request.getParameter("location");
@@ -67,7 +53,7 @@ public class LocationController {
 
         userService.addLocationToUser(authorizedUserDto.login(), locationRequestDto);
 
-        return "redirect:/locations/weather";
+        return "redirect:/weather";
     }
 
     @DeleteMapping("/{id}")
@@ -77,6 +63,6 @@ public class LocationController {
             userService.removeLocationsFromUser(authorizedUserDto.login(), locationId);
         }
 
-        return "redirect:/locations/weather";
+        return "redirect:/weather";
     }
 }

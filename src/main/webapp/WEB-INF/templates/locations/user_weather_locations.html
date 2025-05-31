@@ -7,7 +7,7 @@
     <body>
         <div th:replace="~{fragment/header :: header}"></div>
         <main>
-            <form th:method="get" th:action="@{/locations}">
+            <form th:method="get" th:action="@{/locations/search}">
                 <label for="search">Search</label><br/>
                 <input id="search" type="text" name="location" placeholder="Enter location name"/><br/>
                 <button type="submit">Search</button>

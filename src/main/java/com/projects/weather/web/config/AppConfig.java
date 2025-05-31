@@ -76,7 +76,6 @@ public class AppConfig implements WebMvcConfigurer {
 
     private Properties hibernateProperties() {
         var properties = new Properties();
-        properties.put("hibernate.dialect", env.getRequiredProperty("hibernate.dialect"));
         properties.put("hibernate.show_sql", env.getRequiredProperty("hibernate.show_sql"));
         properties.put("hibernate.format_sql", env.getRequiredProperty("hibernate.format_sql"));
         properties.put("hibernate.highlight_sql", env.getRequiredProperty("hibernate.highlight_sql"));
