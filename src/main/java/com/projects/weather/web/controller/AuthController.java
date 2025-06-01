@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute("user") LoginRequestDto loginRequestDto, HttpServletResponse resp) {
+    public String login(@ModelAttribute("loginRequest") LoginRequestDto loginRequestDto, HttpServletResponse resp) {
         var sessionId = authService.login(loginRequestDto);
         sessionCookieUtils.setSessionCookie(resp, sessionId);
 
@@ -61,7 +61,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute("user") RegisterRequestDto registerRequestDto) {
+    public String register(@ModelAttribute("registerRequest") RegisterRequestDto registerRequestDto) {
         authService.register(registerRequestDto);
         return "redirect:/auth/login";
     }
