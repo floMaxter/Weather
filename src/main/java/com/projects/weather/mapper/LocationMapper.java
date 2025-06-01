@@ -2,7 +2,6 @@ package com.projects.weather.mapper;
 
 import com.projects.weather.dto.external.openweather.CurrentWeatherResponseDto;
 import com.projects.weather.dto.external.openweather.LocationSearchResponseDto;
-import com.projects.weather.dto.location.internal.LocationWithCoordinatesDto;
 import com.projects.weather.dto.location.request.CreateLocationRequestDto;
 import com.projects.weather.dto.location.response.LocationSearchReadDto;
 import com.projects.weather.dto.location.response.LocationWithWeatherDto;
@@ -13,11 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocationMapper {
 
-    public LocationWithWeatherDto toLocationWithCoordinatesDto(CurrentWeatherResponseDto currentWeatherDto,
-                                                               LocationWithCoordinatesDto locationWithCoordinatesDto) {
+    public LocationWithWeatherDto toLocationWithWeatherDto(Location location,
+                                                           CurrentWeatherResponseDto currentWeatherDto) {
         return LocationWithWeatherDto.builder()
-                .id(locationWithCoordinatesDto.id())
-                .name(locationWithCoordinatesDto.name())
+                .id(location.getId())
+                .name(location.getName())
                 .countyCode(currentWeatherDto.sysInfo().countryCode())
                 .weatherInfo(LocationWithWeatherDto.WeatherInfo.builder()
                         .condition(currentWeatherDto.weatherInfo().getFirst().condition())

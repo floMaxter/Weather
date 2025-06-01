@@ -36,7 +36,7 @@ public class LocationController {
         model.addAttribute("userDto", authorizedUserDto);
 
         var locationName = request.getParameter("location");
-        if (locationName != null) {
+        if (locationName != null && !locationName.isEmpty()) {
             var locations = locationService.getLocationsByName(locationName);
             model.addAttribute("locations", locations);
         }

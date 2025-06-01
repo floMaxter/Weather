@@ -2,7 +2,6 @@ package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.service.LocationService;
-import com.projects.weather.service.UserService;
 import com.projects.weather.web.annotation.AuthorizedUser;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/weather")
 public class WeatherController {
 
-    private final UserService userService;
     private final LocationService locationService;
 
     @Autowired
-    public WeatherController(UserService userService, LocationService locationService) {
-        this.userService = userService;
+    public WeatherController(LocationService locationService) {
         this.locationService = locationService;
     }
 
@@ -30,8 +27,7 @@ public class WeatherController {
         model.addAttribute("userDto", authorizedUserDto);
 
         if (authorizedUserDto != null) {
-            var userWithLocationsDto = userService.findByLogin(authorizedUserDto.login());
-            var locationsWithWeather = locationService.getWeatherForLocations(userWithLocationsDto.locations());
+            var locationsWithWeather = locationService.getLocationsWithWeatherByUserLogin(authorizedUserDto.login());
             model.addAttribute("locationsWithWeather", locationsWithWeather);
         }
 

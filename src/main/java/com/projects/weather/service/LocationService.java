@@ -1,10 +1,10 @@
 package com.projects.weather.service;
 
 import com.projects.weather.client.OpenWeatherClient;
-import com.projects.weather.dto.location.internal.LocationWithCoordinatesDto;
 import com.projects.weather.dto.location.response.LocationSearchReadDto;
 import com.projects.weather.dto.location.response.LocationWithWeatherDto;
 import com.projects.weather.mapper.LocationMapper;
+import com.projects.weather.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,22 +16,28 @@ public class LocationService {
 
     private final OpenWeatherClient openWeatherClient;
     private final LocationMapper locationMapper;
+    private final LocationRepository locationRepository;
 
     @Autowired
-    public LocationService(OpenWeatherClient openWeatherClient, LocationMapper locationMapper) {
+    public LocationService(OpenWeatherClient openWeatherClient,
+                           LocationMapper locationMapper,
+                           LocationRepository locationRepository) {
         this.openWeatherClient = openWeatherClient;
         this.locationMapper = locationMapper;
+        this.locationRepository = locationRepository;
     }
 
-    public List<LocationWithWeatherDto> getWeatherForLocations(List<LocationWithCoordinatesDto> locationWithCoordinatesDtos) {
-        List<LocationWithWeatherDto> locationWithWeatherDtos = new ArrayList<>();
-        for (var location : locationWithCoordinatesDtos) {
-            var currentWeather = openWeatherClient.findWeatherDataByCoordinates(location.latitude(), location.longitude());
-            var locationWithWeatherDto = locationMapper.toLocationWithCoordinatesDto(currentWeather, location);
-            locationWithWeatherDtos.add(locationWithWeatherDto);
+    public List<LocationWithWeatherDto> getLocationsWithWeatherByUserLogin(String login) {
+        var locations = locationRepository.findByUserLogin(login);
+
+        List<LocationWithWeatherDto> locationsWithWeather = new ArrayList<>();
+        for (var location : locations) {
+            var currentWeather = openWeatherClient.findWeatherDataByCoordinates(location.getLatitude(), location.getLongitude());
+            var locationWithWeatherDto = locationMapper.toLocationWithWeatherDto(location, currentWeather);
+            locationsWithWeather.add(locationWithWeatherDto);
         }
 
-        return locationWithWeatherDtos;
+        return locationsWithWeather;
     }
 
     public List<LocationSearchReadDto> getLocationsByName(String locationName) {

@@ -13,9 +13,8 @@ public class UserRepository extends AbstractHibernateRepository<Long, User> {
     }
 
     public Optional<User> findByLogin(String login) {
-        return findOrEmpty(() ->
-                entityManager.createQuery("select u from User u join fetch u.locations where u.login = :login", User.class)
-                        .setParameter("login", login)
-                        .getSingleResult());
+        return findOrEmpty(() -> entityManager.createQuery("select u from User u where u.login = :login", User.class)
+                .setParameter("login", login)
+                .getSingleResult());
     }
 }
