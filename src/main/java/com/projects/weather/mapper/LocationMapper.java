@@ -14,20 +14,28 @@ public class LocationMapper {
 
     public LocationWithWeatherDto toLocationWithWeatherDto(Location location,
                                                            CurrentWeatherResponseDto currentWeatherDto) {
+        var countryCode = currentWeatherDto.sysInfo().countryCode();
+        var weatherInfo = currentWeatherDto.weatherInfo().getFirst();
+        var temperatureInfo = currentWeatherDto.temperatureInfo();
+
         return LocationWithWeatherDto.builder()
                 .id(location.getId())
                 .name(location.getName())
-                .countyCode(currentWeatherDto.sysInfo().countryCode())
+                .countyCode(countryCode)
                 .weatherInfo(LocationWithWeatherDto.WeatherInfo.builder()
-                        .condition(currentWeatherDto.weatherInfo().getFirst().condition())
-                        .description(currentWeatherDto.weatherInfo().getFirst().description())
-                        .iconId(currentWeatherDto.weatherInfo().getFirst().iconId())
+                        .condition(weatherInfo.condition())
+                        .description(weatherInfo.description())
+                        .iconId(weatherInfo.iconId())
                         .build())
-                .temperatureInfo(LocationWithWeatherDto.TemperatureInfo.builder()
-                        .temperature(currentWeatherDto.temperatureInfo().temperature())
-                        .feelsLikeTemp(currentWeatherDto.temperatureInfo().feelsLikeTemp())
-                        .humidity(currentWeatherDto.temperatureInfo().humidity())
-                        .build())
+                .temperatureInfo(roundTemperatureInfo(temperatureInfo))
+                .build();
+    }
+
+    private LocationWithWeatherDto.TemperatureInfo roundTemperatureInfo(CurrentWeatherResponseDto.TemperatureInfo temperatureInfo) {
+        return LocationWithWeatherDto.TemperatureInfo.builder()
+                .temperature((int) Math.round(temperatureInfo.temperature()))
+                .feelsLikeTemp((int) Math.round(temperatureInfo.feelsLikeTemp()))
+                .humidity((int) Math.round(temperatureInfo.humidity()))
                 .build();
     }
 

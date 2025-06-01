@@ -16,8 +16,8 @@ public record LocationWithWeatherDto(Long id,
     }
 
     @Builder
-    public record TemperatureInfo(Double temperature,
-                                   Double feelsLikeTemp,
-                                   Double humidity) {
+    public record TemperatureInfo(int temperature,
+                                   int feelsLikeTemp,
+                                   int humidity) {
     }
 }
