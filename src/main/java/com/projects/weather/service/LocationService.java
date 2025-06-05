@@ -1,6 +1,7 @@
 package com.projects.weather.service;
 
 import com.projects.weather.client.OpenWeatherClient;
+import com.projects.weather.dto.location.request.CreateLocationRequestDto;
 import com.projects.weather.dto.location.response.LocationSearchReadDto;
 import com.projects.weather.dto.location.response.LocationWithWeatherDto;
 import com.projects.weather.mapper.LocationMapper;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LocationService {
@@ -44,5 +46,13 @@ public class LocationService {
         return openWeatherClient.findAllLocationsByName(locationName).stream()
                 .map(locationMapper::toLocationSearchReadDto)
                 .toList();
+    }
+
+    public boolean isLocationAlreadyAdded(String userLogin, CreateLocationRequestDto locationRequestDto) {
+        return locationRepository.findByUserLogin(userLogin).stream()
+                .anyMatch(existinglocation ->
+                        Objects.equals(existinglocation.getLongitude(), locationRequestDto.longitude())
+                        && Objects.equals(existinglocation.getLatitude(), locationRequestDto.latitude())
+                );
     }
 }

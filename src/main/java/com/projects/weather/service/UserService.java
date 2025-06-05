@@ -1,10 +1,8 @@
 package com.projects.weather.service;
 
 import com.projects.weather.dto.location.request.CreateLocationRequestDto;
-import com.projects.weather.dto.user.response.UserWithLocationsDto;
 import com.projects.weather.exception.NotFoundException;
 import com.projects.weather.mapper.LocationMapper;
-import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,23 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final LocationMapper locationMapper;
 
     @Autowired
     public UserService(UserRepository userRepository,
-                       UserMapper userMapper,
                        LocationMapper locationMapper) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
         this.locationMapper = locationMapper;
-    }
-
-    @Transactional(readOnly = true)
-    public UserWithLocationsDto findByLogin(String login) {
-        return userRepository.findByLogin(login)
-                .map(userMapper::toUserWithLocationsDto)
-                .orElseThrow(() -> new NotFoundException("The user with this login was not found: " + login));
     }
 
     @Transactional
