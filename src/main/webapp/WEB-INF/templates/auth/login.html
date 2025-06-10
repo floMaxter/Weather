@@ -17,6 +17,9 @@
                     <button type="button">Register</button>
                 </a>
             </div>
+            <div th:if="${error}">
+                <p th:text="${error}"></p>
+            </div>
         </form>
     </body>
 </html>

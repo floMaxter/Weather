@@ -14,10 +14,10 @@
             </form>
             <div th:each="location : ${locations}">
                 <p th:text="${location.name()}">locationName</p>
-                Latitude: <p th:text="${location.latitude()}">latitude</p>
-                Longitude: <p th:text="${location.longitude()}">longitude</p>
-                County: <p th:text="${location.country()}">country</p>
-                State: <p th:text="${location.state()}">state</p>
+                Latitude: <span th:text="${location.latitude()}">latitude</span>
+                Longitude: <span th:text="${location.longitude()}">longitude</span>
+                County: <span th:text="${location.country()}">country</span>
+                State: <span th:text="${location.state()}">state</span>
 
                 <form th:action="@{/locations}" method="post">
                     <input type="hidden" name="name" th:value="${location.name}">
