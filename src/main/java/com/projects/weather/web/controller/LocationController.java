@@ -9,7 +9,6 @@ import com.projects.weather.web.annotation.AuthorizedUser;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/locations")
-@Validated
 public class LocationController {
 
     private final UserService userService;
@@ -34,11 +32,17 @@ public class LocationController {
     }
 
     @GetMapping("/search")
-    public String searchLocations(Model model,
-                                  @AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
-                                  @RequestParam("location") String locationName) {
-        var locations = locationService.getLocationsByName(locationName);
+    public String searchLocations(@AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
+                                  @RequestParam("location") String locationName,
+                                  Model model) {
         model.addAttribute("userDto", authorizedUserDto);
+
+        if (locationName == null || locationName.isBlank()) {
+            model.addAttribute("locationNameSearchError", "The location name should not be empty");
+            return "locations/locations";
+        }
+
+        var locations = locationService.getLocationsByName(locationName);
         model.addAttribute("locations", locations);
 
         return "locations/locations";

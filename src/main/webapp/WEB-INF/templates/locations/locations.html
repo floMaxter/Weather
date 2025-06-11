@@ -11,6 +11,9 @@
                 <label for="search">Search</label><br/>
                 <input id="search" type="text" name="location" placeholder="Enter location name" th:required="required"/><br/>
                 <button type="submit">Search</button>
+                <div th:if="${locationNameSearchError}">
+                    <p th:text="${locationNameSearchError}"></p>
+                </div>
             </form>
             <div th:each="location : ${locations}">
                 <p th:text="${location.name()}">locationName</p>

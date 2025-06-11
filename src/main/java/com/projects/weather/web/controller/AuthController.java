@@ -58,6 +58,7 @@ public class AuthController {
             return "auth/login";
         } catch (InvalidPasswordException ex) {
             bindingResult.rejectValue("password", "", ex.getMessage());
+            return "auth/login";
         }
 
         return "redirect:/weather";
