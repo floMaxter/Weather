@@ -9,13 +9,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InvalidPasswordException.class)
-    public String handleInvalidPasswordException(InvalidPasswordException ex,
-                                                 RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("error", ex.getMessage());
-        return "redirect:/auth/login";
-    }
-
     @ExceptionHandler(LocationAlreadyExistsException.class)
     public String handleLocationAlreadyExistsException(LocationAlreadyExistsException ex,
                                                        RedirectAttributes redirectAttributes) {
@@ -34,7 +27,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public String handleUnhandledException(HttpServletResponse response,
-                                  Model model) {
+                                           Model model) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         model.addAttribute("error", "Something went wrong.");
         return "error/error_page";

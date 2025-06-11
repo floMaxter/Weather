@@ -9,16 +9,17 @@
         <form th:method="post" th:action="@{/auth/login}" th:object="${loginRequest}">
             <div>
                 <label for="login">Login</label>
-                <input type="text" th:field="*{login}" id="login" required/><br/>
+                <input type="text" th:field="*{login}" id="login" required/>
+                <div th:if="${#fields.hasErrors('login')}" th:errors="*{login}">Login error</div>
+                <br/>
                 <label for="password">Password</label>
-                <input type="password" th:field="*{password}" id="password" required/><br/>
+                <input type="password" th:field="*{password}" id="password" required/>
+                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</div>
+                <br/>
                 <input type="submit" value="Login"><br/>
                 <a th:href="@{/auth/register}">
                     <button type="button">Register</button>
                 </a>
-            </div>
-            <div th:if="${error}">
-                <p th:text="${error}"></p>
             </div>
         </form>
     </body>

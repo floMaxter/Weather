@@ -4,6 +4,7 @@ import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.dto.user.request.LoginRequestDto;
 import com.projects.weather.dto.user.request.RegisterRequestDto;
 import com.projects.weather.exception.InvalidPasswordException;
+import com.projects.weather.exception.UserNotFoundException;
 import com.projects.weather.model.Session;
 import com.projects.weather.model.User;
 import com.projects.weather.repository.SessionRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,7 +41,7 @@ public class AuthService {
     @Transactional
     public UUID login(LoginRequestDto loginRequestDto) {
         var user = userRepository.findByLogin(loginRequestDto.login())
-                .orElseThrow(() -> new NoSuchElementException("The user with this login was not found: " + loginRequestDto.login()));
+                .orElseThrow(() -> new UserNotFoundException("The user with this login was not found: " + loginRequestDto.login()));
 
         checkPassword(loginRequestDto, user);
 

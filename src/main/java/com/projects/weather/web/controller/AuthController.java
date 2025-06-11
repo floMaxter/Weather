@@ -2,14 +2,19 @@ package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.user.request.LoginRequestDto;
 import com.projects.weather.dto.user.request.RegisterRequestDto;
+import com.projects.weather.exception.EntityAlreadyExistsException;
+import com.projects.weather.exception.InvalidPasswordException;
+import com.projects.weather.exception.UserNotFoundException;
 import com.projects.weather.service.AuthService;
 import com.projects.weather.util.SessionCookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,9 +43,22 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute("loginRequest") LoginRequestDto loginRequestDto, HttpServletResponse resp) {
-        var sessionId = authService.login(loginRequestDto);
-        sessionCookieUtils.setSessionCookie(resp, sessionId);
+    public String login(@Valid @ModelAttribute("loginRequest") LoginRequestDto loginRequestDto,
+                        BindingResult bindingResult,
+                        HttpServletResponse resp) {
+        if (bindingResult.hasErrors()) {
+            return "auth/login";
+        }
+
+        try {
+            var sessionId = authService.login(loginRequestDto);
+            sessionCookieUtils.setSessionCookie(resp, sessionId);
+        } catch (UserNotFoundException ex) {
+            bindingResult.rejectValue("login", "", "The user with this login was not found");
+            return "auth/login";
+        } catch (InvalidPasswordException ex) {
+            bindingResult.rejectValue("password", "", ex.getMessage());
+        }
 
         return "redirect:/weather";
     }
@@ -61,8 +79,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute("registerRequest") RegisterRequestDto registerRequestDto) {
-        authService.register(registerRequestDto);
+    public String register(@Valid @ModelAttribute("registerRequest") RegisterRequestDto registerRequestDto,
+                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "auth/registration";
+        }
+
+        try {
+            authService.register(registerRequestDto);
+        } catch (EntityAlreadyExistsException ex) {
+            bindingResult.rejectValue("login", "", "This login is already taken");
+            return "auth/registration";
+        }
+
         return "redirect:/auth/login";
     }
 }

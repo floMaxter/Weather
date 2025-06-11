@@ -1,10 +1,11 @@
 package com.projects.weather.repository;
 
 import com.projects.weather.exception.DatabaseException;
+import com.projects.weather.exception.EntityAlreadyExistsException;
 import com.projects.weather.model.Identifiable;
 import com.projects.weather.util.DaoRetriever;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -43,7 +43,18 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E exte
 
     @Override
     public E save(E entity) {
-        entityManager.persist(entity);
+        try {
+            entityManager.persist(entity);
+        } catch (RuntimeException ex) {
+            if (ex.getMessage().contains("duplicate")) {
+                log.warn("Attempt to save entity with non-unique attributes", ex);
+                throw new EntityAlreadyExistsException("Attempt to save entity with non-unique attributes");
+            }
+
+            log.error("Unexpected error occurred while saving the entity in database", ex);
+            throw new DatabaseException("Unexpected error occurred while saving the entity in database");
+        }
+
         return entity;
     }
 
@@ -68,12 +79,12 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E exte
     protected Optional<E> findOrEmpty(DaoRetriever<E> retriever) {
         try {
             return Optional.of(retriever.retrieve());
-        } catch (NoSuchElementException e) {
-            log.debug("No result found", e);
+        } catch (NoResultException ex) {
+            log.debug("No result found", ex);
             return Optional.empty();
-        } catch (NonUniqueResultException e) {
-            log.error("Multiple result found when single was expected", e);
-            throw new DatabaseException("Multiple result found when single was expected", e);
+        } catch (RuntimeException ex) {
+            log.error("Unexpected error occurred while retrieving data from database", ex);
+            throw new DatabaseException("Unexpected error occurred while retrieving data from database");
         }
     }
 }
