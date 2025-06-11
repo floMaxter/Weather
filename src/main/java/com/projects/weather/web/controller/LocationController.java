@@ -2,7 +2,6 @@ package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.location.request.CreateLocationRequestDto;
 import com.projects.weather.dto.user.request.AuthorizedUserDto;
-import com.projects.weather.exception.LocationAlreadyExistsException;
 import com.projects.weather.service.LocationService;
 import com.projects.weather.service.UserService;
 import com.projects.weather.web.annotation.AuthorizedUser;
@@ -49,14 +48,6 @@ public class LocationController {
         if (authorizedUserDto == null) {
             return "redirect:/auth/login";
         }
-
-        if (locationService.isLocationAlreadyAdded(authorizedUserDto.login(), locationRequestDto)) {
-            throw new LocationAlreadyExistsException("This location has already been added to the weather list: " +
-                                                     "name=" + locationRequestDto.name() + ", " +
-                                                     "latitude=" + locationRequestDto.latitude() + ", " +
-                                                     "longitude=" + locationRequestDto.longitude());
-        }
-
         userService.addLocationToUser(authorizedUserDto.login(), locationRequestDto);
 
         return "redirect:/weather";
