@@ -2,6 +2,7 @@ package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.location.request.CreateLocationRequestDto;
 import com.projects.weather.dto.user.request.AuthorizedUserDto;
+import com.projects.weather.exception.LocationAlreadyExistsException;
 import com.projects.weather.service.LocationService;
 import com.projects.weather.service.UserService;
 import com.projects.weather.web.annotation.AuthorizedUser;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/locations")
@@ -44,11 +46,19 @@ public class LocationController {
 
     @PostMapping
     public String addLocation(@AuthorizedUser @Nullable AuthorizedUserDto authorizedUserDto,
-                              @ModelAttribute CreateLocationRequestDto locationRequestDto) {
+                              @ModelAttribute CreateLocationRequestDto locationRequestDto,
+                              RedirectAttributes redirectAttributes) {
         if (authorizedUserDto == null) {
             return "redirect:/auth/login";
         }
-        userService.addLocationToUser(authorizedUserDto.login(), locationRequestDto);
+
+        try {
+            userService.addLocationToUser(authorizedUserDto.login(), locationRequestDto);
+        } catch (LocationAlreadyExistsException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addAttribute("location", locationRequestDto.name());
+            return "redirect:/locations/search";
+        }
 
         return "redirect:/weather";
     }

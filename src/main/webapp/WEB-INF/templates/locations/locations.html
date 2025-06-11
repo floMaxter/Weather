@@ -27,6 +27,9 @@
                 </form>
                 <hr/>
             </div>
+            <div th:if="${error}">
+                <p th:text="${error}"></p>
+            </div>
         </main>
     </body>
 </html>
