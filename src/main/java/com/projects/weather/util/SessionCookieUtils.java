@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Component
 public class SessionCookieUtils {
@@ -46,5 +47,9 @@ public class SessionCookieUtils {
 
     public String getAuthorizedUserAttribute() {
         return sessionProperties.getAuthorizedUserAttribute();
+    }
+
+    public boolean isValidSessionId(String uuid) {
+        return Pattern.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", uuid);
     }
 }

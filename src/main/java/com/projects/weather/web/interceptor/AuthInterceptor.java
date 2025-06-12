@@ -1,5 +1,6 @@
 package com.projects.weather.web.interceptor;
 
+import com.projects.weather.exception.InvalidSessionException;
 import com.projects.weather.service.AuthService;
 import com.projects.weather.util.SessionCookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,10 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         sessionCookieUtils.getSessionCookie(request).ifPresent(sessionCookie -> {
+            if (!sessionCookieUtils.isValidSessionId(sessionCookie.getValue())) {
+                throw new InvalidSessionException("Invalid session id");
+            }
+
             var sessionId = UUID.fromString(sessionCookie.getValue());
             authService.findAuthorizedUserBySessionId(sessionId).ifPresent(authorizedUserDto ->
                     request.setAttribute(sessionCookieUtils.getAuthorizedUserAttribute(), authorizedUserDto));

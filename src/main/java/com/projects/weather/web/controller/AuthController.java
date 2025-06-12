@@ -4,6 +4,7 @@ import com.projects.weather.dto.user.request.LoginRequestDto;
 import com.projects.weather.dto.user.request.RegisterRequestDto;
 import com.projects.weather.exception.EntityAlreadyExistsException;
 import com.projects.weather.exception.InvalidPasswordException;
+import com.projects.weather.exception.InvalidSessionException;
 import com.projects.weather.exception.UserNotFoundException;
 import com.projects.weather.service.AuthService;
 import com.projects.weather.util.SessionCookieUtils;
@@ -66,8 +67,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     public String logout(HttpServletRequest req, HttpServletResponse resp) {
-        sessionCookieUtils.getSessionCookie(req).ifPresent(cookie ->
-                authService.logout(UUID.fromString(cookie.getValue())));
+        var sessionCookie = sessionCookieUtils.getSessionCookie(req)
+                .orElseThrow(() -> new InvalidSessionException("Session not found"));
+
+        if (!sessionCookieUtils.isValidSessionId(sessionCookie.getValue())) {
+            throw new InvalidSessionException("Invalid session id");
+        }
+
+        authService.logout(UUID.fromString(sessionCookie.getValue()));
         sessionCookieUtils.expireSessionCookie(resp);
 
         return "redirect:/auth/login";
