@@ -1,6 +1,6 @@
 package com.projects.weather.web.resolver;
 
-import com.projects.weather.dto.user.request.AuthorizedUserDto;
+import com.projects.weather.dto.user.response.AuthorizedUserDto;
 import com.projects.weather.util.SessionCookieUtils;
 import com.projects.weather.web.annotation.AuthorizedUser;
 import jakarta.servlet.http.HttpServletRequest;

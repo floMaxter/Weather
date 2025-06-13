@@ -1,7 +1,7 @@
 package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.location.request.CreateLocationRequestDto;
-import com.projects.weather.dto.user.request.AuthorizedUserDto;
+import com.projects.weather.dto.user.response.AuthorizedUserDto;
 import com.projects.weather.exception.LocationAlreadyExistsException;
 import com.projects.weather.service.LocationService;
 import com.projects.weather.service.UserService;
