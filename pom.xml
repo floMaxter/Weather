@@ -17,7 +17,6 @@
         <postgresql.version>42.7.5</postgresql.version>
         <hibernate-orm.version>6.6.8.Final</hibernate-orm.version>
         <liquibase.version>4.31.1</liquibase.version>
-        <mapstruct.version>1.6.3</mapstruct.version>
 
         <jbcrypt.version>0.4</jbcrypt.version>
 
@@ -74,19 +73,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
-        </dependency>
-
-        <!--ORM mapping-->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!--Migration-->
@@ -227,12 +213,6 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
-                        </path>
-                        <!--MapStruct-->
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
