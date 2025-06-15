@@ -1,7 +1,6 @@
 package com.projects.weather.repository;
 
 import com.projects.weather.exception.DatabaseException;
-import com.projects.weather.exception.EntityAlreadyExistsException;
 import com.projects.weather.model.Identifiable;
 import com.projects.weather.util.DaoRetriever;
 import jakarta.persistence.EntityManager;
@@ -43,18 +42,7 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E exte
 
     @Override
     public E save(E entity) {
-        try {
-            entityManager.persist(entity);
-        } catch (RuntimeException ex) {
-            if (ex.getMessage().contains("duplicate")) {
-                log.warn("Attempt to save entity with non-unique attributes", ex);
-                throw new EntityAlreadyExistsException("Attempt to save entity with non-unique attributes");
-            }
-
-            log.error("Unexpected error occurred while saving the entity in database", ex);
-            throw new DatabaseException("Unexpected error occurred while saving the entity in database");
-        }
-
+        entityManager.persist(entity);
         return entity;
     }
 
@@ -62,15 +50,6 @@ public abstract class AbstractHibernateRepository<K extends Serializable, E exte
     public void delete(K id) {
         var entity = entityManager.find(entityClass, id);
         if (entity != null) {
-            entityManager.remove(entity);
-            entityManager.flush();
-        }
-    }
-
-    @Override
-    public void deleteAll() {
-        var entities = findAll();
-        for (var entity : entities) {
             entityManager.remove(entity);
             entityManager.flush();
         }

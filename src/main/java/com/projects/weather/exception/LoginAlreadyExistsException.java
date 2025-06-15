@@ -2,9 +2,9 @@ package com.projects.weather.exception;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-public class EntityAlreadyExistsException extends GenericApplicationException {
+public class LoginAlreadyExistsException extends GenericApplicationException {
 
-    public EntityAlreadyExistsException(String message) {
+    public LoginAlreadyExistsException(String message) {
         super(message, HttpServletResponse.SC_CONFLICT);
     }
 }

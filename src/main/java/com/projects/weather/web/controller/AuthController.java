@@ -2,7 +2,7 @@ package com.projects.weather.web.controller;
 
 import com.projects.weather.dto.user.request.LoginRequestDto;
 import com.projects.weather.dto.user.request.RegisterRequestDto;
-import com.projects.weather.exception.EntityAlreadyExistsException;
+import com.projects.weather.exception.LoginAlreadyExistsException;
 import com.projects.weather.exception.InvalidPasswordException;
 import com.projects.weather.exception.InvalidSessionException;
 import com.projects.weather.exception.UserNotFoundException;
@@ -95,7 +95,7 @@ public class AuthController {
 
         try {
             authService.register(registerRequestDto);
-        } catch (EntityAlreadyExistsException ex) {
+        } catch (LoginAlreadyExistsException ex) {
             bindingResult.rejectValue("login", "", "This login is already taken");
             return "auth/registration";
         }

@@ -1,16 +1,23 @@
 package com.projects.weather.service;
 
-import com.projects.weather.dto.user.request.AuthorizedUserDto;
 import com.projects.weather.dto.user.request.LoginRequestDto;
 import com.projects.weather.dto.user.request.RegisterRequestDto;
+import com.projects.weather.dto.user.response.AuthorizedUserDto;
+import com.projects.weather.exception.DatabaseException;
 import com.projects.weather.exception.InvalidPasswordException;
+import com.projects.weather.exception.LoginAlreadyExistsException;
 import com.projects.weather.exception.UserNotFoundException;
+import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.model.Session;
 import com.projects.weather.model.User;
 import com.projects.weather.repository.SessionRepository;
 import com.projects.weather.repository.UserRepository;
 import com.projects.weather.security.PasswordEncoder;
-import org.springframework.beans.factory.annotation.Value;
+import com.projects.weather.util.PersistenceExceptionUtil;
+import com.projects.weather.web.config.SessionProperties;
+import jakarta.persistence.PersistenceException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,23 +25,27 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class AuthService {
 
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final SessionProperties sessionProperties;
 
-    private final int sessionDurationMinutes;
-
+    @Autowired
     public AuthService(SessionRepository sessionRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       @Value("${session.duration}") int sessionDurationMinutes) {
+                       UserMapper userMapper,
+                       SessionProperties sessionProperties) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.sessionDurationMinutes = sessionDurationMinutes;
+        this.userMapper = userMapper;
+        this.sessionProperties = sessionProperties;
     }
 
 
@@ -56,10 +67,17 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterRequestDto registerRequestDto) {
-        userRepository.save(User.builder()
-                .login(registerRequestDto.login())
-                .password(passwordEncoder.encode(registerRequestDto.password()))
-                .build());
+        var user = userMapper.toUser(registerRequestDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        try {
+            userRepository.save(user);
+        } catch (PersistenceException ex) {
+            if (PersistenceExceptionUtil.isUniqueConstraintViolation(ex, "uk_users_login")) {
+                throw new LoginAlreadyExistsException("The " + registerRequestDto.login() + " login already exists");
+            }
+            throw new DatabaseException("Unexpected error while saving an entity to the database");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +97,7 @@ public class AuthService {
     }
 
     private LocalDateTime calculateExpiresAt() {
-        return LocalDateTime.now().plusMinutes(sessionDurationMinutes);
+        return LocalDateTime.now().plusMinutes(sessionProperties.getDuration());
     }
 
     private boolean isSessionExpired(Session session) {
