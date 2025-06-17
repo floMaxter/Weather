@@ -6,6 +6,7 @@ import com.projects.weather.exception.LoginAlreadyExistsException;
 import com.projects.weather.exception.InvalidPasswordException;
 import com.projects.weather.exception.InvalidSessionException;
 import com.projects.weather.exception.UserNotFoundException;
+import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.service.AuthService;
 import com.projects.weather.util.SessionCookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,11 +31,15 @@ public class AuthController {
 
     private final AuthService authService;
     private final SessionCookieUtils sessionCookieUtils;
+    private final UserMapper userMapper;
 
     @Autowired
-    public AuthController(AuthService authService, SessionCookieUtils sessionCookieUtils) {
+    public AuthController(AuthService authService,
+                          SessionCookieUtils sessionCookieUtils,
+                          UserMapper userMapper) {
         this.authService = authService;
         this.sessionCookieUtils = sessionCookieUtils;
+        this.userMapper = userMapper;
     }
 
     @GetMapping("/login")
@@ -52,7 +57,7 @@ public class AuthController {
         }
 
         try {
-            var sessionId = authService.login(loginRequestDto);
+            var sessionId = authService.login(loginRequestDto.login(), loginRequestDto.password());
             sessionCookieUtils.setSessionCookie(resp, sessionId);
         } catch (UserNotFoundException ex) {
             bindingResult.rejectValue("login", "", "The user with this login was not found");
@@ -94,7 +99,7 @@ public class AuthController {
         }
 
         try {
-            authService.register(registerRequestDto);
+            authService.register(userMapper.toUser(registerRequestDto));
         } catch (LoginAlreadyExistsException ex) {
             bindingResult.rejectValue("login", "", "This login is already taken");
             return "auth/registration";

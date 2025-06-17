@@ -26,7 +26,7 @@ public class SessionCookieUtils {
         var sessionCookie = new Cookie(sessionProperties.getCookieName(), sessionId.toString());
         sessionCookie.setPath(sessionProperties.getCookiePath());
         sessionCookie.setHttpOnly(true);
-        sessionCookie.setMaxAge(sessionProperties.getDuration());
+        sessionCookie.setMaxAge(sessionProperties.getDurationSeconds());
         resp.addCookie(sessionCookie);
     }
 

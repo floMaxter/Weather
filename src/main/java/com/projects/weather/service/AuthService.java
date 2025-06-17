@@ -50,11 +50,11 @@ public class AuthService {
 
 
     @Transactional
-    public UUID login(LoginRequestDto loginRequestDto) {
-        var user = userRepository.findByLogin(loginRequestDto.login())
-                .orElseThrow(() -> new UserNotFoundException("The user with this login was not found: " + loginRequestDto.login()));
+    public UUID login(String login, String password) {
+        var user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException("The user with this login was not found: " + login));
 
-        checkPassword(loginRequestDto, user);
+        checkPassword(password, user.getPassword());
 
         var session = sessionRepository.save(new Session(user, calculateExpiresAt()));
         return session.getId();
@@ -66,8 +66,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void register(RegisterRequestDto registerRequestDto) {
-        var user = userMapper.toUser(registerRequestDto);
+    public void register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         try {
@@ -90,14 +89,14 @@ public class AuthService {
                 });
     }
 
-    private void checkPassword(LoginRequestDto loginRequestDto, User user) {
-        if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())) {
+    private void checkPassword(String rawPassword, String hashedPassword) {
+        if (!passwordEncoder.matches(rawPassword, hashedPassword)) {
             throw new InvalidPasswordException("Invalid password");
         }
     }
 
     private LocalDateTime calculateExpiresAt() {
-        return LocalDateTime.now().plusMinutes(sessionProperties.getDuration());
+        return LocalDateTime.now().plusMinutes(sessionProperties.getDurationSeconds());
     }
 
     private boolean isSessionExpired(Session session) {
