@@ -1,10 +1,11 @@
 package com.projects.weather.security;
 
+import com.projects.weather.exception.InvalidPasswordException;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BCyptPasswordEncoder implements PasswordEncoder {
+public class BCryptPasswordEncoder implements PasswordEncoder {
 
     @Override
     public String encode(String rawPassword) {
