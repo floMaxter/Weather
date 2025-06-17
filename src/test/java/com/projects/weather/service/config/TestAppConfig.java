@@ -1,6 +1,8 @@
 package com.projects.weather.service.config;
 
 import com.projects.weather.client.OpenWeatherClient;
+import com.projects.weather.web.config.ConstraintProperties;
+import com.projects.weather.web.config.SessionProperties;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,13 +12,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestClient;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
+@EnableTransactionManagement
 @ComponentScan(basePackages = {
         "com.projects.weather.client",
         "com.projects.weather.service",
@@ -53,12 +59,17 @@ public class TestAppConfig {
 
     private Properties hibernateProperties() {
         var properties = new Properties();
-        properties.put("hibernate.dialect", env.getRequiredProperty("hibernate.dialect"));
         properties.put("hibernate.show_sql", env.getRequiredProperty("hibernate.show_sql"));
         properties.put("hibernate.format_sql", env.getRequiredProperty("hibernate.format_sql"));
         properties.put("hibernate.highlight_sql", env.getRequiredProperty("hibernate.highlight_sql"));
-
         return properties;
+    }
+
+    @Bean
+    public PlatformTransactionManager hibernateTransactionManager() {
+        var transactionManager = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory().getObject());
+        return transactionManager;
     }
 
     @Bean
@@ -71,14 +82,34 @@ public class TestAppConfig {
     }
 
     @Bean
-    public OpenWeatherClient openWeatherClient(RestClient restClient,
-                                               @Value("${api.weather.api_key}") String apiKey,
-                                               @Value("${api.weather.units_of_measurement}") String unitsOfMeasurement) {
-        return new OpenWeatherClient(restClient, apiKey, unitsOfMeasurement);
+    public SessionProperties sessionProperties(@Value("${session.duration_seconds}") int durationSeconds,
+                                               @Value("${session.cookie_name}") String cookieName,
+                                               @Value("${session.cookie_path}") String cookiePath,
+                                               @Value("${session.authorized_user_attribute}") String authorizedUserAttribute) {
+        return SessionProperties.builder()
+                .cookieName(cookieName)
+                .durationSeconds(durationSeconds)
+                .cookiePath(cookiePath)
+                .authorizedUserAttribute(authorizedUserAttribute)
+                .build();
     }
 
     @Bean
-    public RestClient restClient(@Value("${api.weather.base_url}") String baseUrl) {
+    public ConstraintProperties constraintProperties(@Value("${constraints.users.login}") String usersLoginConstraint) {
+        return new ConstraintProperties(usersLoginConstraint);
+    }
+
+
+    @Bean
+    public OpenWeatherClient openWeatherClient(RestClient restClient,
+                                               @Value("${open_weather_api.weather.api_key}") String apiKey,
+                                               @Value("${open_weather_api.weather.units_of_measurement}") String unitsOfMeasurement,
+                                               @Value("${open_weather_api.location.search_limit}") int locationSearchLimit) {
+        return new OpenWeatherClient(restClient, apiKey, unitsOfMeasurement, locationSearchLimit);
+    }
+
+    @Bean
+    public RestClient restClient(@Value("${open_weather_api.weather.base_url}") String baseUrl) {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
