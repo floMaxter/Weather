@@ -3,7 +3,7 @@ package com.projects.weather.service.integration.service;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.projects.weather.client.OpenWeatherClient;
-import com.projects.weather.dto.WeatherDataResponseDto;
+import com.projects.weather.dto.external.openweather.CurrentWeatherResponseDto;
 import com.projects.weather.exception.OpenWeatherClientException;
 import com.projects.weather.service.config.TestAppConfig;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,14 +43,14 @@ public class OpenWeatherClientIT {
 
     @DynamicPropertySource
     static void setUpMockBaseUrl(DynamicPropertyRegistry registry) {
-        registry.add("api.weather.base_url", wireMockExtension::baseUrl);
+        registry.add("open_weather_api.weather.base_url", wireMockExtension::baseUrl);
     }
 
     private final OpenWeatherClient openWeatherClient;
 
-    @Value("${api.weather.api_key}")
+    @Value("${open_weather_api.weather.api_key}")
     private String apiKey;
-    @Value("${api.weather.units_of_measurement}")
+    @Value("${open_weather_api.weather.units_of_measurement}")
     private String unitsOfMeasurement;
 
     @AfterEach
@@ -105,7 +105,7 @@ public class OpenWeatherClientIT {
         );
 
         // when
-        var resultLocations = openWeatherClient.findAllLocationsByName(locationName, limit);
+        var resultLocations = openWeatherClient.findAllLocationsByName(locationName);
 
         // then
         assertThat(resultLocations).hasSize(limit);
@@ -129,7 +129,7 @@ public class OpenWeatherClientIT {
         );
 
         // when
-        var resultLocations = openWeatherClient.findAllLocationsByName(locationName, limit);
+        var resultLocations = openWeatherClient.findAllLocationsByName(locationName);
 
         // then
         assertThat(resultLocations).isEmpty();
@@ -160,7 +160,7 @@ public class OpenWeatherClientIT {
         // when
 
         // then
-        assertThatThrownBy(() -> openWeatherClient.findAllLocationsByName(locationName, limit))
+        assertThatThrownBy(() -> openWeatherClient.findAllLocationsByName(locationName))
                 .isInstanceOf(OpenWeatherClientException.class);
     }
 
@@ -181,7 +181,7 @@ public class OpenWeatherClientIT {
         // when
 
         // then
-        assertThatThrownBy(() -> openWeatherClient.findAllLocationsByName(locationName, limit))
+        assertThatThrownBy(() -> openWeatherClient.findAllLocationsByName(locationName))
                 .isInstanceOf(OpenWeatherClientException.class);
     }
 
@@ -226,6 +226,7 @@ public class OpenWeatherClientIT {
                    },
                    "dt": 1745921032,
                    "sys": {
+                     "country": "RU",
                      "sunrise": 1745889614,
                      "sunset": 1745937495
                    },
@@ -236,9 +237,10 @@ public class OpenWeatherClientIT {
                  }
                 """;
 
-        var expectedWeatherDataResponseDto = new WeatherDataResponseDto(
-                List.of(new WeatherDataResponseDto.WeatherInfo("Clear", "clear sky")),
-                new WeatherDataResponseDto.TemperatureInfo(39.71, 36.08, 5.0)
+        var expectedWeatherDataResponseDto = new CurrentWeatherResponseDto(
+                List.of(new CurrentWeatherResponseDto.WeatherInfo("Clear", "clear sky", "01d")),
+                new CurrentWeatherResponseDto.TemperatureInfo(39.71, 36.08, 5.0),
+                new CurrentWeatherResponseDto.SysInfo("RU")
         );
 
         wireMockExtension.stubFor(

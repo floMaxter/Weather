@@ -4,8 +4,9 @@
 create table if not exists Users
 (
     id       int auto_increment primary key,
-    login    varchar(255) not null unique,
-    password varchar(255) not null
+    login    varchar(255) not null,
+    password varchar(255) not null,
+    constraint uk_users_login unique (login)
 );
 
 --changeset maxvdovin:2
