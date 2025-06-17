@@ -1,19 +1,17 @@
 package com.projects.weather.service;
 
-import com.projects.weather.dto.user.request.LoginRequestDto;
-import com.projects.weather.dto.user.request.RegisterRequestDto;
 import com.projects.weather.dto.user.response.AuthorizedUserDto;
 import com.projects.weather.exception.DatabaseException;
 import com.projects.weather.exception.InvalidPasswordException;
 import com.projects.weather.exception.LoginAlreadyExistsException;
 import com.projects.weather.exception.UserNotFoundException;
-import com.projects.weather.mapper.UserMapper;
 import com.projects.weather.model.Session;
 import com.projects.weather.model.User;
 import com.projects.weather.repository.SessionRepository;
 import com.projects.weather.repository.UserRepository;
 import com.projects.weather.security.PasswordEncoder;
 import com.projects.weather.util.PersistenceExceptionUtil;
+import com.projects.weather.web.config.ConstraintProperties;
 import com.projects.weather.web.config.SessionProperties;
 import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +30,20 @@ public class AuthService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
     private final SessionProperties sessionProperties;
+    private final ConstraintProperties constraintProperties;
 
     @Autowired
     public AuthService(SessionRepository sessionRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       UserMapper userMapper,
-                       SessionProperties sessionProperties) {
+                       SessionProperties sessionProperties,
+                       ConstraintProperties constraintProperties) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
         this.sessionProperties = sessionProperties;
+        this.constraintProperties = constraintProperties;
     }
 
 
@@ -72,8 +70,8 @@ public class AuthService {
         try {
             userRepository.save(user);
         } catch (PersistenceException ex) {
-            if (PersistenceExceptionUtil.isUniqueConstraintViolation(ex, "uk_users_login")) {
-                throw new LoginAlreadyExistsException("The " + registerRequestDto.login() + " login already exists");
+            if (PersistenceExceptionUtil.isUniqueConstraintViolation(ex, constraintProperties.getUsersLoginConstraint())) {
+                throw new LoginAlreadyExistsException("The " + user.getLogin() + " login already exists");
             }
             throw new DatabaseException("Unexpected error while saving an entity to the database");
         }

@@ -8,11 +8,12 @@ import org.hibernate.exception.ConstraintViolationException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PersistenceExceptionUtil {
 
-    public static boolean isUniqueConstraintViolation(Throwable throwable, String constraintName) {
+    public static boolean isUniqueConstraintViolation(Throwable throwable, String constraintKey) {
         var currentThrowable = throwable;
         while (currentThrowable != null) {
             if (currentThrowable instanceof ConstraintViolationException violationException) {
-                if (constraintName.equals(violationException.getConstraintName())) {
+                var constraintName = violationException.getConstraintName();
+                if (constraintName != null && constraintName.toLowerCase().contains(constraintKey)) {
                     return true;
                 }
             }
