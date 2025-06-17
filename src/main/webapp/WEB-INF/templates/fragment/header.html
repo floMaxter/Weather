@@ -1,27 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Main header</title>
-    </head>
-    <body>
-        <header th:fragment="header">
-            <nav>
-                <ul>
-                    <li th:if="${userDto != null}">
-                        <span th:text="${userDto.login}"></span>
-                        <form th:action="@{/auth/logout}" method="post">
-                            <button type="submit">Logout</button>
-                        </form>
-                    </li>
-                    <li th:unless="${userDto != null}">
-                        <a th:href="@{/auth/login}">Login</a>
-                    </li>
-                    <li th:unless="${userDto != null}">
-                        <a th:href="@{/auth/register}">Register</a>
-                    </li>
-                </ul>
-            </nav>
-        </header>
-    </body>
-</html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav class="navbar navbar-light bg-light" th:fragment="header(userDto)">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Weather App</a>
+            <div class="d-flex align-items-center">
+                <div th:if="${userDto != null}" class="d-flex align-items-center">
+                    <span class="navbar-text me-3" th:text="${userDto?.login}">user@email.com</span>
+                    <form th:action="@{/auth/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger">Sign out</button>
+                    </form>
+                </div>
+                <div th:unless="${userDto != null}" class="d-flex align-items-center">
+                    <a class="btn btn-outline-primary me-2" th:href="@{/auth/login}">Login</a>
+                    <a class="btn btn-primary" th:href="@{/auth/register}">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html> 

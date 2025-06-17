@@ -2,11 +2,28 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Error page</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/static/css/style.css">
     </head>
     <body>
-        <div th:if="${error}">
-            <p th:text="${error}"></p>
-        </div>
+        <section class="d-flex align-items-center min-vh-100">
+            <div class="container text-center">
+                <div class="alert alert-danger w-100" role="alert" th:if="${error}">
+                    <h4 class="alert-heading">An Error Occurred!</h4>
+                    <p th:text="${error}"></p>
+                    <hr>
+                    <p class="mb-0">Please try again later or contact support.</p>
+                </div>
+                <div th:unless="${error}">
+                    <h1 class="display-4">Oops!</h1>
+                    <p class="lead">Something went wrong.</p>
+                    <p>We are sorry for the inconvenience. Please try again later.</p>
+                </div>
+                <a th:href="@{/weather}" class="btn btn-primary mt-3">Go to Homepage</a>
+            </div>
+        </section>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
